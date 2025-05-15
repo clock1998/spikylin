@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35913.81 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spikylin", "Spikylin\Spikylin.csproj", "{49A4D669-B01A-40E7-B623-9D62252E28EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{49A4D669-B01A-40E7-B623-9D62252E28EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49A4D669-B01A-40E7-B623-9D62252E28EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49A4D669-B01A-40E7-B623-9D62252E28EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49A4D669-B01A-40E7-B623-9D62252E28EC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2AB236E2-7769-438B-BDAF-1EE1D1C7AF81}
+	EndGlobalSection
+EndGlobal

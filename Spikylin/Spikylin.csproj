@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>a1aa5383-2fe8-4530-834a-b170619f73e4</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Markdig" Version="0.41.1" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<UpToDateCheckBuilt Include="wwwroot/site.css" Set="Css" />
+	<UpToDateCheckBuilt Include="wwwroot/tailwind.config.js" Set="Css" />
+  </ItemGroup>
+	
+  <Target Name="TailwindDevelopment" BeforeTargets="Compile">
+	<Exec Command="npx tailwindcss -i ./wwwroot/site.css -o ./wwwroot/tailwind.css" />
+  </Target>
+  <Target Name="TailwindRelease" BeforeTargets="Compile" Condition="'$(Configuration)' == 'Release'">
+	<Exec EnvironmentVariables="NODE_ENV=production" Command="npx tailwindcss -i ./wwwroot/site.css -o ./wwwroot/tailwind.css --minify" />
+  </Target>
+</Project>

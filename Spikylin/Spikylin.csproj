@@ -12,11 +12,16 @@
     <PackageReference Include="Markdig" Version="0.41.1" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 
   <ItemGroup>
 	<UpToDateCheckBuilt Include="wwwroot/site.css" Set="Css" />
 	<UpToDateCheckBuilt Include="wwwroot/tailwind.config.js" Set="Css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\NewFolder\" />
   </ItemGroup>
 	
   <Target Name="TailwindDevelopment" BeforeTargets="Compile">

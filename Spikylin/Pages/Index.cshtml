@@ -1,12 +1,51 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+	ViewData["Title"] = "Home";
 }
+<div class="mx-auto my-3 max-w-4xl">
+	<div class="flex flex-wrap items-start justify-start gap-1">
+		@foreach (var tag in Model.Tags)
+		{
+			<button class="btn btn-sm"><span class="surface-4">&num;@Html.DisplayFor(n => tag)</span></button>	
+		}
+	</div>
 
-<div class="text-center">
-    <button class="btn">Default</button>
-    <h1 class="text-3xl font-bold underline">
-        Hello world!
-    </h1>
+	<div class="divider text-2xl font-semibold">Featured</div>
+	<ul class="list">
+		@foreach (var doc in Model.Documents.Where(n=>n.MarkdownDocument.Meta.Featured))
+		{
+			<a asp-page="/Post" asp-route-fileName="@doc.FileName">
+				<li class="list-row">
+					<div class="prose">
+						<h4>[@doc.MarkdownDocument.Meta.Date] @doc.MarkdownDocument.Meta.Title</h4>
+						<p>@doc.MarkdownDocument.Meta.Description</p>
+						<div>
+							@foreach (var tag in doc.MarkdownDocument.Meta.Tags)
+							{
+								<span class="px-1">&num;@tag</span>	
+							}
+						</div>
+					</div>
+				</li>
+			</a>
+		}
+	</ul>
+	<div class="divider text-2xl font-semibold">Posts</div>
+	<ul class="list">
+		@foreach (var doc in Model.Documents)
+		{
+			<a asp-page="/Post" asp-route-fileName="@doc.FileName">
+				<li class="list-row">
+					<div class="prose">
+						<p>[@doc.MarkdownDocument.Meta.Date] @doc.MarkdownDocument.Meta.Title</p>
+						@foreach (var tag in doc.MarkdownDocument.Meta.Tags)
+						{
+							<span class="px-1">&num;@tag</span>	
+						}
+					</div>
+				</li>
+			</a>
+		}
+	</ul>
 </div>

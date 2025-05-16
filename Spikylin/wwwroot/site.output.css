@@ -1055,6 +1055,9 @@
   .py-1 {
     padding-block: calc(var(--spacing) * 1);
   }
+  .pr-1 {
+    padding-right: calc(var(--spacing) * 1);
+  }
   .text-2xl {
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));

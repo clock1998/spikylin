@@ -9,7 +9,7 @@ published: true
 featured: false
 ---
 
-![image](/post_images/threejs.png "Example")
+![image](/images/post_images/threejs.png "Example")
 
 This is not a tutorial but an experiment with using ThreeJs. I want to create a 3D carousel effect for displaying users' profiles. Each rectangle will display a profile picture with some basic information about the user. As I am using SvelteKit, it is logical to choose a SvelteKit friendly library to bring ThreeJs to the project. My choice is Threlte. It makes things clearer and more intuitive.
 The idea is very simple. We change the rectangles position to make it a circle. When it detects scroll or mouse down, the positions will change, making it like a carousel. For the transition animation, I use the building animation from spring as it has a very nice inertia effect.

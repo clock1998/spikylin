@@ -19,7 +19,7 @@ I dicided to change the architecture from Clean Architecture to CQRS. There are 
 4. Reduce merge conflict.
 
 In my old clean architecture, all the business logic resides in the AuthRepository.cs file. But now, the logic is seperated into different commands:
-![alt text](/post_images/refactor-clean-architecture-to-vertical-slice/CQRS-file-structure.png)
+![alt text](/images/post_images/refactor-clean-architecture-to-vertical-slice/CQRS-file-structure.png)
 However, I did not put my controller methods in the handlers, as I use traditional controller methods. I feel it is better to put all the end points in the same class so I can get the grouping and naming feature from the framework. One downside is that if I have many more end points for a single feature, the controller class will be super large. A potential solution is to have partial class. Minimal API method is another option, and it is better to use Minimal API if you want to put end points in the same files as handlers.
 
 I also added Fluent Validator. It makes the validation more clean. I mainly use the validator to valide data model not business logic validation.

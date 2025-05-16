@@ -18,9 +18,9 @@ Anyway, there are three main reasons to refactor my project.
 - Scattered files across multiple projects and folders.
 
 The old project followed clean architecture and repository design parttern, as you can see from the picture below.
-![clean architecture](/post_images/refactor-clean-architecture-to-vertical-slice/clean-architecture.png "Clean Architecture")
+![clean architecture](/images/post_images/refactor-clean-architecture-to-vertical-slice/clean-architecture.png "Clean Architecture")
 My entities are all in the Db project. The business logic lives in the repositories folder. And the controllers are in the controllers folder. The reason that I did not put them in a seperate project was my project was not particularly big, but it is common practice to put them in sperated projects. Under the Repositories folder, I created a generic repository that abstract away Entity Framework that I use. The idea is to reduce code repitition. There are some pros and cons. This approach allows me to switch out Entity Framework if I want to, but the actually layer of abstraction added complexity. Later on, I also learned that repository pattern is redundant if I decide to use Entity Framework. The framework itself is an implementation of repository parttern. 
-![repository](/post_images/refactor-clean-architecture-to-vertical-slice/repository.png "Repository")
+![repository](/images/post_images/refactor-clean-architecture-to-vertical-slice/repository.png "Repository")
 
 ```csharp
 public interface IRepository<T> where T : class
@@ -288,6 +288,6 @@ public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] Semester
 It leaks the business logic to the controller which is not good.
 
 Anothe problem is that DTOs are everywhere. They are in the controllers and repositories, and it is confusing when there are look-alike DTOs. I also find it hard to name them properly for their specific use cases. For the chatting room alone, I already have four DTOs:
-![DTO](/post_images/refactor-clean-architecture-to-vertical-slice/DTO.png)
+![DTO](/images/post_images/refactor-clean-architecture-to-vertical-slice/DTO.png)
 
 The repository pattern has some benefits but I do not see it to scale well, besides it is not necessary if I use Entity Framework. There are too much abstraction and too many layers. The "Go To Implementation" feature does not work sometimes in Visual Studio. I can see when the project gets bigger it will be hard to maintain with different projects, file locations and abstractions.

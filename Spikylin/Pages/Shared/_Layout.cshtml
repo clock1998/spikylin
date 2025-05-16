@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Spikylin</title>
-    <script type="importmap"></script>
     <link href="~/tailwind.css" rel="stylesheet" asp-append-version="true">
 </head>
 <body>
@@ -12,7 +11,7 @@
     </header>
     <div class="navbar bg-base-100 sticky top-0 z-10 backdrop-blur-sm">
         <div class="navbar-start">
-            <a class="ml-4" href="/"><img src="image/logo.png" alt="Logo" width="40" class="rounded-lg" /></a>
+            <a class="ml-4" href="/"><img src="~/images/logo.png" alt="Logo" width="40" class="rounded-lg" /></a>
             <div class="dropdown">
                 <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
                     <svg xmlns="http://www.w3.org/2000/svg"
@@ -96,10 +95,10 @@
     </div>
 
     <div>
-        <div class="container mx-auto">
+        <div class="container mx-auto">r
             <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <div class="bg-base-200 flex flex-col items-center">
-                    <div class="p-4"><img src="image/about.jpg" alt="about" class="max-w-48 rounded-lg" /></div>
+                    <div class="p-4"><img src="~/images/about.jpg" alt="about" class="max-w-48 rounded-lg" /></div>
                     <div class="prose-xl px-14">
                         <p>
                             I'm Linyi, and welcome to my personal blog. I live in the beautiful city of Montreal, where I spend my time exploring my passions for software development, outdoor adventures, and sharing knowledge.
@@ -123,7 +122,5 @@
             <a href="https://www.linkedin.com/in/linyi-jiang/" aria-label="asd"><i class="fa-brands fa-linkedin fa-lg"></i></a>
         </div>
     </footer>
-
-
 </body>
 </html>

@@ -9,7 +9,7 @@ published: true
 featured: false
 ---
 
-![image](/post_images/threejs.png "Example")
+![image](/images/post_images/threejs.png "Example")
 
 Ce n'est pas un tutoriel, mais une expérience avec ThreeJs. Je veux créer un effet de carrousel 3D pour afficher les profils des utilisateurs. Chaque rectangle affichera une photo de profil avec quelques informations de base sur l'utilisateur. Comme j'utilise SvelteKit, il est logique de choisir une bibliothèque compatible avec SvelteKit pour intégrer ThreeJs dans le projet. Mon choix s'est porté sur Threlte, qui rend les choses plus claires et intuitives.
 

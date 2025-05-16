@@ -19,13 +19,9 @@
 	<UpToDateCheckBuilt Include="wwwroot/site.css" Set="Css" />
 	<UpToDateCheckBuilt Include="wwwroot/tailwind.config.js" Set="Css" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages\NewFolder\" />
-  </ItemGroup>
 	
   <Target Name="TailwindDevelopment" BeforeTargets="Compile">
-	<Exec Command="npx tailwindcss -i ./wwwroot/site.css -o ./wwwroot/tailwind.css" />
+	<Exec Command="npm run build:css" />
   </Target>
   <Target Name="TailwindRelease" BeforeTargets="Compile" Condition="'$(Configuration)' == 'Release'">
 	<Exec EnvironmentVariables="NODE_ENV=production" Command="npx tailwindcss -i ./wwwroot/site.css -o ./wwwroot/tailwind.css --minify" />

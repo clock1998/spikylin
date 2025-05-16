@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spikylin.Infrastructure.Helper;
+using Spikylin.Infrastructure.Model;
 
 namespace Spikylin.Pages
 {
@@ -8,14 +9,10 @@ namespace Spikylin.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IWebHostEnvironment _env;
-        public class Document
-        {
-            public string FileName { get; set; } = string.Empty;
-            public MarkdownDocument MarkdownDocument { get; set; } = new MarkdownDocument();
-        }
+
         [BindProperty]
-        public List<Document> Documents { get; set; } = new List<Document>();
-        public List<string> Tags => Documents.SelectMany(n => n.MarkdownDocument.Meta.Tags).Distinct().ToList();
+        public List<Post> Documents { get; set; } = new List<Post>();
+        public List<string> Tags => Documents.SelectMany(n => n.Markdown.Meta.Tags).Distinct().ToList();
         public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment env)
         {
             _logger = logger;
@@ -31,8 +28,8 @@ namespace Spikylin.Pages
                 foreach (var file in files)
                 {
                     var markdownContent = System.IO.File.ReadAllText(file);
-                    var markdown = MarkdownDocumentParser.Parse(markdownContent);
-                    Documents.Add(new Document { FileName = Path.GetFileNameWithoutExtension(file), MarkdownDocument = markdown});
+                    var markdown = MarkdigMarkdownParser.Parse(markdownContent);
+                    Documents.Add(new Post { FileName = Path.GetFileNameWithoutExtension(file), Markdown = markdown});
                 }
             }
         }

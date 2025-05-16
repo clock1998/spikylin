@@ -6,12 +6,12 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace Spikylin.Infrastructure.Helper
 {
-    public class MarkdownDocument
+    public class Markdown
     {
-        public MarkdownDocumentMetadata Meta { get; init; } = new MarkdownDocumentMetadata();
+        public MarkdownMetadata Meta { get; init; } = new MarkdownMetadata();
         public string Html { get; init; } = string.Empty;
     }
-    public class MarkdownDocumentMetadata
+    public class MarkdownMetadata
     {
         public string Title { get; set; } = "";
         public string Description { get; set; } = "";
@@ -22,9 +22,9 @@ namespace Spikylin.Infrastructure.Helper
     }
 
 
-    public class MarkdownDocumentParser
+    public class MarkdigMarkdownParser
     {
-        public static MarkdownDocument Parse(string markdown)
+        public static Markdown Parse(string markdown)
         {
             var pipeline = new MarkdownPipelineBuilder()
                 .UseYamlFrontMatter()       // <-- enable front-matter parsing
@@ -39,7 +39,7 @@ namespace Spikylin.Infrastructure.Helper
                 .Descendants<YamlFrontMatterBlock>()
                 .FirstOrDefault();
 
-            var meta = new MarkdownDocumentMetadata();
+            var meta = new MarkdownMetadata();
             if (yamlBlock != null)
             {
                 // the content lines of the block
@@ -50,14 +50,14 @@ namespace Spikylin.Infrastructure.Helper
                 var deserializer = new DeserializerBuilder()
                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
                     .Build();
-                meta = deserializer.Deserialize<MarkdownDocumentMetadata>(yaml);
+                meta = deserializer.Deserialize<MarkdownMetadata>(yaml);
                 meta.Tags ??= new List<string>();
             }
 
             // 3) render HTML (ignores the front-matter block by default)
             var html = Markdig.Markdown.ToHtml(markdown, pipeline);
 
-            return new MarkdownDocument
+            return new Markdown
             {
                 Meta = meta,
                 Html = html

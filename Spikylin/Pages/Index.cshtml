@@ -13,15 +13,15 @@
 
 	<div class="divider text-2xl font-semibold">Featured</div>
 	<ul class="list">
-		@foreach (var doc in Model.Documents.Where(n=>n.MarkdownDocument.Meta.Featured))
+		@foreach (var doc in Model.Documents.Where(n=>n.Markdown.Meta.Featured))
 		{
 			<a asp-page="/Post" asp-route-fileName="@doc.FileName">
 				<li class="list-row">
 					<div class="prose">
-						<h4>[@doc.MarkdownDocument.Meta.Date] @doc.MarkdownDocument.Meta.Title</h4>
-						<p>@doc.MarkdownDocument.Meta.Description</p>
+						<h4>[@doc.Markdown.Meta.Date] @doc.Markdown.Meta.Title</h4>
+						<p>@doc.Markdown.Meta.Description</p>
 						<div>
-							@foreach (var tag in doc.MarkdownDocument.Meta.Tags)
+							@foreach (var tag in doc.Markdown.Meta.Tags)
 							{
 								<span class="px-1">&num;@tag</span>	
 							}
@@ -38,8 +38,8 @@
 			<a asp-page="/Post" asp-route-fileName="@doc.FileName">
 				<li class="list-row">
 					<div class="prose">
-						<p>[@doc.MarkdownDocument.Meta.Date] @doc.MarkdownDocument.Meta.Title</p>
-						@foreach (var tag in doc.MarkdownDocument.Meta.Tags)
+						<p>[@doc.Markdown.Meta.Date] @doc.Markdown.Meta.Title</p>
+						@foreach (var tag in doc.Markdown.Meta.Tags)
 						{
 							<span class="px-1">&num;@tag</span>	
 						}

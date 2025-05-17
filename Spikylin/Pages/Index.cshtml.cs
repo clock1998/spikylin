@@ -33,5 +33,10 @@ namespace Spikylin.Pages
                 }
             }
         }
+
+        public void Test()
+        {
+            var x = 1; 
+        }
     }
 }

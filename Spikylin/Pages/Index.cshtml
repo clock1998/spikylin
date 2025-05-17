@@ -7,7 +7,7 @@
 	<div class="flex flex-wrap items-start justify-start gap-1">
 		@foreach (var tag in Model.Tags)
 		{
-			<button class="btn btn-sm"><span class="surface-4">&num;@Html.DisplayFor(n => tag)</span></button>	
+			<button class="btn btn-sm" hx-post="/Test"><span class="surface-4">&num;@Html.DisplayFor(n => tag)</span></button>	
 		}
 	</div>
 

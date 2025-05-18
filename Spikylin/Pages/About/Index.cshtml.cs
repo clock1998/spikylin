@@ -6,7 +6,7 @@ namespace Spikylin.Pages.About;
 
 public class AboutModel(IWebHostEnvironment env) : PageModel
 {
-    public string Content { get; set; } = string.Empty;
+    public string Html { get; set; } = string.Empty;
     public void OnGet()
     {
         // Use the fileName to locate and load the document.
@@ -15,7 +15,7 @@ public class AboutModel(IWebHostEnvironment env) : PageModel
         if (System.IO.File.Exists(filePath))
         {
             var markdownContent = System.IO.File.ReadAllText(filePath);
-            Content = MarkdigMarkdownParser.Parse(markdownContent).Html;
+            Html = MarkdigMarkdownParser.Parse(markdownContent).Html;
         }
     }
 }

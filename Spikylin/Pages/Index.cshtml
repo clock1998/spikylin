@@ -1,51 +1,42 @@
 ﻿@page
 @model IndexModel
 @{
-	ViewData["Title"] = "Home";
+    ViewData["Title"] = "Home";
 }
 <div class="mx-auto my-3 max-w-4xl">
-	<div class="flex flex-wrap items-start justify-start gap-1">
-		@foreach (var tag in Model.Tags)
-		{
-			<button class="btn btn-sm" hx-get="Index?handle=Test" hx-target="posts"><span class="surface-4">&num;@Html.DisplayFor(n => tag)</span></button>
-		}
-	</div>
-
-	<div class="divider text-2xl font-semibold">Featured</div>
-	<ul class="list">
-		@foreach (var doc in Model.Documents.Where(n=>n.Markdown.Meta.Featured))
-		{
-			<a asp-page="/Post" asp-route-fileName="@doc.FileName">
-				<li class="list-row">
-					<div class="prose">
-						<h4>[@doc.Markdown.Meta.Date] @doc.Markdown.Meta.Title</h4>
-						<p>@doc.Markdown.Meta.Description</p>
-						<div>
-							@foreach (var tag in doc.Markdown.Meta.Tags)
-							{
-								<span class="px-1">&num;@tag</span>	
-							}
-						</div>
-					</div>
-				</li>
-			</a>
-		}
-	</ul>
-	<div class="divider text-2xl font-semibold">Posts</div>
-	<ul class="list" id="posts">
-		@foreach (var doc in Model.Documents)
-		{
-			<a asp-page="/Post" asp-route-fileName="@doc.FileName">
-				<li class="list-row">
-					<div class="prose">
-						<p>[@doc.Markdown.Meta.Date] @doc.Markdown.Meta.Title</p>
-						@foreach (var tag in doc.Markdown.Meta.Tags)
-						{
-							<span class="px-1">&num;@tag</span>	
-						}
-					</div>
-				</li>
-			</a>
-		}
-	</ul>
+    <div class="flex flex-wrap items-start justify-start gap-1">
+        @foreach (var tag in Model.Tags)
+        {
+            <button class="btn btn-sm"
+                    hx-get="Index?handler=FilterPosts&tag=@tag"
+                    hx-target="#posts"
+                    hx-swap="innerHTML">
+                <span class="surface-4">&num;@Html.DisplayFor(n => tag)</span>
+            </button>
+        }
+    </div>
+    <div class="divider text-2xl font-semibold">Featured</div>
+    <ul class="list">
+        @foreach (var doc in Model.Posts.Where(n => n.Markdown.Meta.Featured))
+        {
+            <a asp-page="/Post" asp-route-fileName="@doc.FileName">
+            <li class="list-row">
+                <div class="prose">
+                    <h4>[@doc.Markdown.Meta.Date] @doc.Markdown.Meta.Title</h4>
+                    <p>@doc.Markdown.Meta.Description</p>
+                    <div>
+                            @foreach (var tag in doc.Markdown.Meta.Tags)
+                            {
+                                <span class="px-1">&num;@tag</span>
+                            }
+                    </div>
+                </div>
+            </li>
+            </a>
+        }
+    </ul>
+    <div class="divider text-2xl font-semibold">Posts</div>
+    <div id="posts">
+        <partial name="_PostsPartial" model="Model.Posts" />
+    </div>
 </div>

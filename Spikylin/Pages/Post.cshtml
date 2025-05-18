@@ -3,11 +3,8 @@
 @{
 }
 <article class="prose container mx-auto max-w-4xl pb-10">
-	<hgroup>
-		<h1>@Model.Post.Markdown.Meta.Title</h1>
-		<p>Published at @Model.Post.Markdown.Meta.Date</p>
-	</hgroup>
-
+	<h1>@Model.Post.Markdown.Meta.Title</h1>
+	<h3>Published at @Model.Post.Markdown.Meta.Date</h3>
 	<div class="flex gap-1">
 		@foreach (var tag in @Model.Post.Markdown.Meta.Tags)
 		{

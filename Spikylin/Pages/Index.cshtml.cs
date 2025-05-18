@@ -10,9 +10,8 @@ namespace Spikylin.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly IWebHostEnvironment _env;
 
-        [BindProperty]
-        public List<Post> Documents { get; set; } = new List<Post>();
-        public List<string> Tags => Documents.SelectMany(n => n.Markdown.Meta.Tags).Distinct().ToList();
+        public List<Post> Posts { get; set; } = new List<Post>();
+        public List<string> Tags => Posts.SelectMany(n => n.Markdown.Meta.Tags).Distinct().ToList();
         public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment env)
         {
             _logger = logger;
@@ -20,8 +19,20 @@ namespace Spikylin.Pages
         }
         public void OnGet()
         {
+            LoadPosts();
+        }
+
+        public IActionResult OnGetFilterPosts(string tag)
+        {
+            LoadPosts();
+            var filteredPosts = Posts.Where(n => n.Markdown.Meta.Tags.Contains(tag)).ToList();
+            return Partial("_PostsPartial", filteredPosts);
+        }
+
+        private void LoadPosts()
+        {
+            Posts.Clear();
             var contentPath = Path.Combine(_env.ContentRootPath, "Posts");
-            
             if (Directory.Exists(contentPath))
             {
                 var files = Directory.GetFiles(contentPath, "*.md", SearchOption.AllDirectories);
@@ -29,14 +40,9 @@ namespace Spikylin.Pages
                 {
                     var markdownContent = System.IO.File.ReadAllText(file);
                     var markdown = MarkdigMarkdownParser.Parse(markdownContent);
-                    Documents.Add(new Post { FileName = Path.GetFileNameWithoutExtension(file), Markdown = markdown});
+                    Posts.Add(new Post { FileName = Path.GetFileNameWithoutExtension(file), Markdown = markdown });
                 }
             }
-        }
-
-        public void OnGetTest()
-        {
-            var x = 1; 
         }
     }
 }

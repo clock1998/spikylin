@@ -10,7 +10,7 @@
             <button class="btn btn-sm"
                     hx-get="Index?handler=FilterPosts&tag=@tag"
                     hx-target="#posts"
-                    hx-swap="innerHTML">
+                    hx-swap="outerHTML">
                 <span class="surface-4">&num;@Html.DisplayFor(n => tag)</span>
             </button>
         }
@@ -36,7 +36,5 @@
         }
     </ul>
     <div class="divider text-2xl font-semibold">Posts</div>
-    <div id="posts">
-        <partial name="_PostsPartial" model="Model.Posts" />
-    </div>
+    <partial name="_PostsPartial" model="Model.Posts" />
 </div>

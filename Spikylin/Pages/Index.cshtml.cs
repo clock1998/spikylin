@@ -34,7 +34,7 @@ namespace Spikylin.Pages
             }
         }
 
-        public void Test()
+        public void OnGetTest()
         {
             var x = 1; 
         }

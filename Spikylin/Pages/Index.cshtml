@@ -7,7 +7,7 @@
 	<div class="flex flex-wrap items-start justify-start gap-1">
 		@foreach (var tag in Model.Tags)
 		{
-			<button class="btn btn-sm" hx-post="/Test"><span class="surface-4">&num;@Html.DisplayFor(n => tag)</span></button>	
+			<button class="btn btn-sm" hx-get="Index?handle=Test" hx-target="posts"><span class="surface-4">&num;@Html.DisplayFor(n => tag)</span></button>
 		}
 	</div>
 
@@ -32,7 +32,7 @@
 		}
 	</ul>
 	<div class="divider text-2xl font-semibold">Posts</div>
-	<ul class="list">
+	<ul class="list" id="posts">
 		@foreach (var doc in Model.Documents)
 		{
 			<a asp-page="/Post" asp-route-fileName="@doc.FileName">

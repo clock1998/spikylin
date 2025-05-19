@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
 using Spikylin.Infrastructure.Helper;
 using Spikylin.Infrastructure.Model;
 
@@ -9,13 +10,14 @@ namespace Spikylin.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IWebHostEnvironment _env;
-
+        private readonly IStringLocalizer<IndexModel> _localizer;
         public List<Post> Posts { get; set; } = new List<Post>();
         public List<string> Tags => Posts.SelectMany(n => n.Markdown.Meta.Tags).Distinct().ToList();
-        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment env)
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment env, IStringLocalizer<IndexModel> localizer)
         {
             _logger = logger;
             _env = env;
+            _localizer = localizer;
         }
         public void OnGet()
         {

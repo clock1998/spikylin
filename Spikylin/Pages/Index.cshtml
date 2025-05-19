@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@inject IStringLocalizer<IndexModel> Localizer
 @{
     ViewData["Title"] = "Home";
 }
@@ -15,7 +16,7 @@
             </button>
         }
     </div>
-    <div class="divider text-2xl font-semibold">Featured</div>
+    <div class="divider text-2xl font-semibold">@Localizer["Featured"]</div>
     <ul class="list">
         @foreach (var doc in Model.Posts.Where(n => n.Markdown.Meta.Featured))
         {
@@ -35,6 +36,6 @@
             </a>
         }
     </ul>
-    <div class="divider text-2xl font-semibold">Posts</div>
+    <div class="divider text-2xl font-semibold">@Localizer["Posts"]</div>
     <partial name="_PostsPartial" model="Model.Posts" />
 </div>

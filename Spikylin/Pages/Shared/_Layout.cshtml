@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Spikylin.Pages.Shared
+
+@inject IStringLocalizer<SharedResources> SharedLocalizer
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -8,8 +11,6 @@
     <script src="~/htmx.min.js" asp-append-version="true"></script>
 </head>
 <body>
-<header>
-</header>
 <div class="navbar bg-base-100 sticky top-0 z-10 backdrop-blur-sm">
     <div class="navbar-start">
         <a class="ml-4" href="/"><img src="~/images/logo.png" alt="Logo" width="40" class="rounded-lg"/></a>
@@ -30,31 +31,6 @@
                 <div class="card-body p-1 no-underline">
                     <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
                     <a class="py-1" asp-area="" asp-page="/About/Index">About</a>
-                    @*                         {#if search === 'ready'}
-                            <div class="dropdown">
-                                <label class="input input-bordered mx-auto flex w-72 items-center">
-                                    <input class="grow" placeholder="Search" autocomplete="off" spellcheck="false" type="search" bind:value={searchTerm} />
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                         viewBox="0 0 16 16"
-                                         fill="currentColor"
-                                         class="h-4 w-4 opacity-70">
-                                        <path fill-rule="evenodd"
-                                              d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                                              clip-rule="evenodd" />
-                                    </svg>
-                                </label>
-                                <ul class={results.length! == 0 ? "dropdown-content menu bg-base-100 rounded-box z-[1] w-72 p-2 shadow" : "hidden" }>
-                                    {#each results as result}
-                                    <li>
-                                        <a href="/{result.slug}" class="flex flex-col items-start justify-start p-0">
-                                            <p>Title: {@html result.title}</p>
-                                            <p>Content: {@html result.content}</p>
-                                        </a>
-                                    </li>
-                                    {/each}
-                                </ul>
-                            </div>
-                            {/if} *@
                 </div>
             </div>
         </div>
@@ -62,34 +38,20 @@
 
     <div class="navbar-center hidden lg:flex">
         <a class="py-1" asp-area="" asp-page="/About/Index">About</a>
-        @*             {#if search === 'ready'}
-                <div class="dropdown">
-                    <label class="input input-bordered mx-auto flex w-80 items-center">
-                        <input class="grow" placeholder="Search" autocomplete="off" spellcheck="false" type="search" bind:value={searchTerm} />
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 16 16"
-                             fill="currentColor"
-                             class="h-4 w-4 opacity-70">
-                            <path fill-rule="evenodd"
-                                  d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                                  clip-rule="evenodd" />
-                        </svg>
-                    </label>
-                    <ul class={results.length! = =0 ? "dropdown-content menu bg-base-100 rounded-box z-[1] w-80 p-2 shadow" : "hidden" }>
-                        {#each results as result}
-                        <li>
-                            <a href="/{result.slug}" class="flex flex-col items-start justify-start p-0">
-                                <p>Title: {@html result.title}</p>
-                                <p>Content: {@html result.content}</p>
-                            </a>
-                        </li>
-                        {/each}
-                    </ul>
-                </div>
-                {/if} *@
     </div>
 
     <div class="navbar-end">
+@*         <select class="select select-sm ml-2 w-20" on:change={e => switchToLanguage(e.currentTarget.value as AvailableLanguageTag)}>
+    {#each availableLanguageTags as langTag}
+        <option 
+            value={langTag}
+            selected={languageTag() === langTag}
+            >{labels[langTag]}
+        </option>
+    {/each}
+</select> *@
+        <a asp-page="./Index" asp-route-culture="en">English</a>
+        <a asp-page="./Index" asp-route-culture="fr">Français</a>
         @*             <ThemeController></ThemeController>
                 <LanguageController></LanguageController> *@
     </div>
@@ -100,8 +62,7 @@
             <div class="p-4"><img src="~/images/about.jpg" alt="about" class="max-w-48 rounded-lg"/></div>
             <div class="prose-xl px-14">
                 <p>
-                    I'm Linyi, and welcome to my personal blog. I live in the beautiful city of Montreal, where I spend
-                    my time exploring my passions for software development, outdoor adventures, and sharing knowledge.
+                    @SharedLocalizer["self-introduction"]
                 </p>
             </div>
         </div>

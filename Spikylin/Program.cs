@@ -10,13 +10,14 @@ builder.Services.AddRazorPages()
     .AddDataAnnotationsLocalization(); // for validation messages;
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-var supportedCultures = new[]
-{
-    new CultureInfo("en"),
-    new CultureInfo("fr"),
-};
+
 builder.Services.Configure<RequestLocalizationOptions>(opts =>
 {
+    var supportedCultures = new[]
+    {
+        new CultureInfo("en"),
+        new CultureInfo("fr"),
+    };
     opts.DefaultRequestCulture = new RequestCulture("en");
     opts.SupportedCultures = supportedCultures;
     opts.SupportedUICultures = supportedCultures;

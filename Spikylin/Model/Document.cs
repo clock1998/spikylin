@@ -1,6 +1,6 @@
 ﻿using Spikylin.Infrastructure.Helper;
 
-namespace Spikylin.Infrastructure.Model
+namespace Spikylin.Model
 {
     public class Post
     {

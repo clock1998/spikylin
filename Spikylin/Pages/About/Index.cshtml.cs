@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spikylin.Infrastructure.Helper;
-using Spikylin.Infrastructure.Model;
 
 namespace Spikylin.Pages.About;
 

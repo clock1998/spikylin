@@ -1,6 +1,7 @@
 ﻿@page "{fileName}"  
 @model Spikylin.Pages.PostModel
 @{
+	ViewData["Title"] = Model.Post.Markdown.Meta.Title;
 }
 <article class="prose container mx-auto max-w-4xl pb-10">
 	<h1>@Model.Post.Markdown.Meta.Title</h1>

@@ -1,14 +1,13 @@
 ﻿@model Spikylin.Pages.Shared.Components.CultureSwitcher.CultureSwitcherModel
 
 <select name="culture"
-        class="select select-sm ml-2 w-20"
+        class="select select-sm ml-2 w-25"
         hx-get="."
         hx-trigger="change"
         hx-include="this"
         hx-swap="outerHTML"
         hx-push-url="true"
         hx-target="body">
-
     @foreach (var culture in Model.SupportedCultures)
     {
         <option value="@culture.Name"

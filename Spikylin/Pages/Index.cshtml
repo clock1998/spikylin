@@ -23,7 +23,7 @@
             <a asp-page="/Post" asp-route-fileName="@doc.FileName">
             <li class="list-row">
                 <div class="prose">
-                    <h4>[@doc.Markdown.Meta.Date] @doc.Markdown.Meta.Title</h4>
+                    <h4>[@doc.Markdown.Meta.Date.ToShortDateString()] @doc.Markdown.Meta.Title</h4>
                     <p>@doc.Markdown.Meta.Description</p>
                     <div>
                             @foreach (var tag in doc.Markdown.Meta.Tags)

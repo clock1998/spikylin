@@ -3,21 +3,18 @@
 <div>
     <form id="culture-switcher">
 
-        <select name="culture"
-                id="culture-options"
-                class="select select-sm ml-2 w-20"
-                hx-get=""
-                hx-trigger="change"
-                hx-include="this"
-                hx-swap="none">
-
+        <select name="culture" id="culture-options" class="select select-sm ml-2 w-20">
             @foreach (var culture in Model.SupportedCultures)
             {
-                <option value="@culture.Name"
-                        selected="@(Model.CurrentUICulture.Name == culture.Name)">
-                    @culture.DisplayName
-                </option>
+                <option value="@culture.Name" selected="@(Model.CurrentUICulture.Name == culture.Name)">@culture.DisplayName</option>
             }
         </select>
     </form>
 </div>
+
+
+<script>
+    document.getElementById("culture-options").addEventListener("change", () => {
+        document.getElementById("culture-switcher").submit();
+    });
+</script>

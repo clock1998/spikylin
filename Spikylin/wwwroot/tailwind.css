@@ -1415,8 +1415,8 @@
   .w-5 {
     width: calc(var(--spacing) * 5);
   }
-  .w-20 {
-    width: calc(var(--spacing) * 20);
+  .w-25 {
+    width: calc(var(--spacing) * 25);
   }
   .max-w-4xl {
     max-width: var(--container-4xl);

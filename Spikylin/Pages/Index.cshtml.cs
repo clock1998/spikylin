@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
 using Spikylin.Infrastructure.Helper;
 using Spikylin.Model;
+using System.Globalization;
 
 namespace Spikylin.Pages
 {
@@ -34,10 +35,11 @@ namespace Spikylin.Pages
         private void LoadPosts()
         {
             Posts.Clear();
+            var cultureName = CultureInfo.CurrentCulture.Name;
             var contentPath = Path.Combine(_env.ContentRootPath, "Posts");
             if (Directory.Exists(contentPath))
             {
-                var files = Directory.GetFiles(contentPath, "*.md", SearchOption.AllDirectories);
+                var files = cultureName == "en" ? Directory.GetFiles(contentPath, "*.md", SearchOption.AllDirectories) : Directory.GetFiles(contentPath, "*.fr.md", SearchOption.AllDirectories);
                 foreach (var file in files)
                 {
                     var markdownContent = System.IO.File.ReadAllText(file);

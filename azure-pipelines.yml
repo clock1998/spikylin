@@ -1,0 +1,63 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+variables:
+  container-registry: 'ghcr.io'
+  container-repository: 'clock1998/spikylin'
+  container-name: 'spikylin'
+  tag: 'latest'
+pool:
+  name: Azure Selfhosted
+steps:
+- task: CmdLine@2
+  displayName: Clean docker cache
+  inputs:
+    script: 'docker builder prune -f'
+
+- task: Docker@2
+  displayName: Docker Build
+  inputs:
+    command: 'build'
+    Dockerfile: 'Dockerfile'
+    containerRegistry: $(container-registry)
+    repository: $(container-repository)
+    tags: $(tag)
+
+- task: CmdLine@2
+  displayName: Docker Login
+  inputs:
+    script: 'docker login --username clock1998 --password $(GITHUB-TOKEN) ghcr.io'
+
+- task: CmdLine@2
+  displayName: Docker Push
+  inputs:
+    script: 'docker push $(container-registry)/$(container-repository):$(tag)'
+  # inputs:
+  #   containerRegistry: $(container-registry)
+  #   command: 'push'
+  #   repository: $(container-repository)
+  #   tags: $(tag)
+- task: CmdLine@2
+  displayName: Clean docker cache
+  inputs:
+    script: | 
+      docker builder prune -f
+      docker image prune -f
+- task: CopyFiles@2
+  displayName: Copy docker compose file.
+  inputs:
+    SourceFolder: './'
+    Contents: 'docker-compose.yml'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    OverWrite: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'

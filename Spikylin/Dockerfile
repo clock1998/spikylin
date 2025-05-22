@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Spikylin/Spikylin.csproj", "Spikylin/"]
+COPY ["/Spikylin/Spikylin.csproj", "Spikylin/"]
 RUN dotnet restore "./Spikylin/Spikylin.csproj"
 COPY . .
 WORKDIR "/src/Spikylin"

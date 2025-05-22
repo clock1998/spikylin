@@ -23,7 +23,7 @@ steps:
   displayName: Docker Build
   inputs:
     command: 'build'
-    Dockerfile: 'Dockerfile'
+    Dockerfile: './Spikylin/Dockerfile'
     containerRegistry: $(container-registry)
     repository: $(container-repository)
     tags: $(tag)
@@ -51,7 +51,7 @@ steps:
 - task: CopyFiles@2
   displayName: Copy docker compose file.
   inputs:
-    SourceFolder: './'
+    SourceFolder: './Spikylin'
     Contents: 'docker-compose.yml'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     OverWrite: true

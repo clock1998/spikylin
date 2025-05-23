@@ -19,6 +19,7 @@ WORKDIR /src/Spikylin
 RUN apt update
 RUN apt install -y nodejs
 RUN apt install -y npm
+RUN npm i
 RUN dotnet build "./Spikylin.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage

@@ -25,7 +25,7 @@
     <Folder Include="Pages\Post\" />
   </ItemGroup>
 	
-  <Target Name="TailwindDevelopment" BeforeTargets="Compile">
+  <Target Name="TailwindDevelopment" BeforeTargets="Compile" Condition="'$(Configuration)' != 'Release'">
 	<Exec Command="npm run build:css" />
   </Target>
   <Target Name="TailwindRelease" BeforeTargets="Compile" Condition="'$(Configuration)' == 'Release'">

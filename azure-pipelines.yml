@@ -24,6 +24,7 @@ steps:
   inputs:
     command: 'build'
     Dockerfile: './Spikylin/Dockerfile'
+    buildContext: './'
     containerRegistry: $(container-registry)
     repository: $(container-repository)
     tags: $(tag)

@@ -8,6 +8,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - Spikylin</title>
+    <link rel="icon" href="~/images/logo.png" />
     <link href="~/tailwind.css" rel="stylesheet" asp-append-version="true">
     <script src="~/htmx.min.js" asp-append-version="true"></script>
 </head>
@@ -42,9 +43,9 @@
     </div>
 
     <div class="navbar-end">
+        <vc:culture-switcher/>
             @await Component.InvokeAsync("CultureSwitcher")
-        @*             <ThemeController></ThemeController>
-                <LanguageController></LanguageController> *@
+        @*<ThemeController></ThemeController>*@
     </div>
 </div>
 <div class="container mx-auto">
@@ -66,7 +67,7 @@
 
 <footer class="footer bg-neutral text-neutral-content fixed bottom-0 flex items-baseline justify-center p-2">
     <div>
-        <p>Copyright © {new Date().getFullYear()} - All right reserved</p>
+            <p>Copyright © @(DateTime.Today.Year) - All right reserved</p>
     </div>
     <div class="flex gap-3">
         <a href="https://github.com/clock1998" aria-label="asd"><i class="fa-brands fa-github fa-lg"></i></a>

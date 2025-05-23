@@ -24,7 +24,13 @@ builder.Services.Configure<RequestLocalizationOptions>(opts =>
 
     // Optional: culture via query string, cookie, Accept-Lang header
     opts.RequestCultureProviders.Insert(0,
-        new QueryStringRequestCultureProvider { QueryStringKey = "culture" });
+       new CookieRequestCultureProvider()
+       {
+           CookieName = CookieRequestCultureProvider.DefaultCookieName,
+       });
+
+    //opts.RequestCultureProviders.Insert(0,
+    //    new QueryStringRequestCultureProvider { QueryStringKey = "culture" });
 });
 
 var app = builder.Build();

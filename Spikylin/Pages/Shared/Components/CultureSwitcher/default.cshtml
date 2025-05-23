@@ -1,16 +1,12 @@
 ﻿@model Spikylin.Pages.Shared.Components.CultureSwitcher.CultureSwitcherModel
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
-    // Construct the return URL. This will be the current page.
-    // We try to build a clean URL without the 'culture' query parameter if it exists,
-    // as the cookie will now handle the culture.
-    var request = HttpContextAccessor.HttpContext.Request;
-    var currentPath = request.Path;
-    var currentQuery = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(request.QueryString.ToString());
-    currentQuery.Remove("culture"); // Remove old culture query param if present
-    // currentQuery.Remove("ui-culture"); // Also remove ui-culture if you used it
+    // Construct the return URL. So the current page will be returned after changing the language. This will be the current page.
+    var request = HttpContextAccessor.HttpContext?.Request;
+    var currentPath = request?.Path;
+    var currentQuery = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(request?.QueryString.ToString());
 
-    var returnUrl = currentPath.Value;
+    var returnUrl = currentPath?.Value;
     if (currentQuery.Any())
     {
         returnUrl += "?" + string.Join("&", currentQuery.Select(kvp => $"{kvp.Key}={kvp.Value}"));

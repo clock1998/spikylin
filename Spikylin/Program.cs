@@ -5,6 +5,7 @@ using System.Globalization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddRazorPages()
     .AddViewLocalization()           // for cshtml views
     .AddDataAnnotationsLocalization(); // for validation messages;
@@ -28,9 +29,6 @@ builder.Services.Configure<RequestLocalizationOptions>(opts =>
        {
            CookieName = CookieRequestCultureProvider.DefaultCookieName,
        });
-
-    //opts.RequestCultureProviders.Insert(0,
-    //    new QueryStringRequestCultureProvider { QueryStringKey = "culture" });
 });
 
 var app = builder.Build();
@@ -44,14 +42,14 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
+app.UseRequestLocalization(locOptions);
+
 app.UseRouting();
 
 app.UseAuthorization();
 app.UseStaticFiles();
 app.MapStaticAssets();
-
-var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
-app.UseRequestLocalization(locOptions);
 
 app.MapRazorPages()
    .WithStaticAssets();

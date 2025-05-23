@@ -1,17 +1,40 @@
 ﻿@model Spikylin.Pages.Shared.Components.CultureSwitcher.CultureSwitcherModel
-<select name="culture"
-        class="select select-sm ml-2 w-25"
-        hx-get="."
-        hx-trigger="change"
-        hx-include="this"
-        hx-swap="outerHTML"
-        hx-push-url="true"
-        hx-target="body">
-    @foreach (var culture in Model.SupportedCultures)
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    // Construct the return URL. This will be the current page.
+    // We try to build a clean URL without the 'culture' query parameter if it exists,
+    // as the cookie will now handle the culture.
+    var request = HttpContextAccessor.HttpContext.Request;
+    var currentPath = request.Path;
+    var currentQuery = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(request.QueryString.ToString());
+    currentQuery.Remove("culture"); // Remove old culture query param if present
+    // currentQuery.Remove("ui-culture"); // Also remove ui-culture if you used it
+
+    var returnUrl = currentPath.Value;
+    if (currentQuery.Any())
     {
-        <option value="@culture.Name"
-                selected="@(Model.CurrentUICulture.Name == culture.Name)">
-            @culture.DisplayName
-        </option>
+        returnUrl += "?" + string.Join("&", currentQuery.Select(kvp => $"{kvp.Key}={kvp.Value}"));
     }
-</select>
+    returnUrl = string.IsNullOrEmpty(returnUrl) ? "/" : returnUrl; // Ensure it's a valid path
+}
+
+<form hx-get="@Url.Page("/Culture", "Set")" 
+      hx-trigger="change from:find select" 
+      hx-target="body" 
+      hx-swap="innerHTML" 
+      hx-push-url="true">
+
+    <input type="hidden" name="returnUrl" value="@returnUrl" />
+    <select name="culture"
+            class="select select-sm ml-2 w-25">
+        @if (Model.SupportedCultures != null)
+        {
+            @foreach (var culture in Model.SupportedCultures)
+            {
+                <option value="@culture.Name" selected="@(Model.CurrentUICulture?.Name == culture.Name)">
+                    @culture.DisplayName
+                </option>
+            }
+        }
+    </select>
+</form>

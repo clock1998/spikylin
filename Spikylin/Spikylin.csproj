@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Markdig" Version="0.41.1" />
     <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.5" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
@@ -22,7 +23,7 @@
   </ItemGroup>
 	
   <Target Name="TailwindDevelopment" BeforeTargets="Compile" Condition="'$(Configuration)' != 'Release'">
-	<Exec Command="npm run build:css" />
+	<Exec Command="npx tailwindcss -i ./wwwroot/site.css -o ./wwwroot/tailwind.css" />
   </Target>
   <Target Name="TailwindRelease" BeforeTargets="Compile" Condition="'$(Configuration)' == 'Release'">
 	<Exec EnvironmentVariables="NODE_ENV=production" Command="npx tailwindcss -i ./wwwroot/site.css -o ./wwwroot/tailwind.css --minify" />

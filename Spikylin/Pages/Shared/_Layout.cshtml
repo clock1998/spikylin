@@ -5,74 +5,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Spikylin</title>
     <link rel="icon" href="~/images/logo.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="~/tailwind.css" rel="stylesheet" asp-append-version="true">
     <script src="~/htmx.min.js" asp-append-version="true"></script>
 </head>
 <body>
-<div class="navbar bg-base-100 sticky top-0 z-10 backdrop-blur-sm">
-    <div class="navbar-start">
-        <a class="ml-4" href="/"><img src="~/images/logo.png" alt="Logo" width="40" class="rounded-lg"/></a>
-        <div class="dropdown">
-            <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     class="h-5 w-5"
-                     fill="none"
-                     viewBox="0 0 24 24"
-                     stroke="currentColor">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M4 6h16M4 12h8m-8 6h16"/>
-                </svg>
-            </div>
-            <div tabindex="0" class="dropdown-content card bg-base-200 z-[1] p-2 shadow">
-                <div class="card-body p-1 no-underline">
-                    <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                    <a class="py-1" asp-area="" asp-page="/About/Index">About</a>
+    <div class="navbar bg-base-100 sticky top-0 z-10 backdrop-blur-sm">
+        <div class="navbar-start">
+            <a class="ml-4" href="/"><img src="~/images/logo.png" alt="Logo" width="40" class="rounded-lg" /></a>
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-5 w-5"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M4 6h16M4 12h8m-8 6h16" />
+                    </svg>
+                </div>
+                <div tabindex="0" class="dropdown-content card bg-base-200 z-[1] p-2 shadow">
+                    <div class="card-body p-1 no-underline">
+                        <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                        <a class="py-1" asp-area="" asp-page="/About/Index">About</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="navbar-center hidden lg:flex">
-        <a class="py-1" asp-area="" asp-page="/About/Index">About</a>
-    </div>
+        <div class="navbar-center hidden lg:flex">
+            <a class="py-1" asp-area="" asp-page="/Index">Blog</a>
+            <a class="py-1" asp-area="" asp-page="/About/Index">About</a>
+        </div>
 
-    <div class="navbar-end">
-        <vc:culture-switcher/>
+        <div class="navbar-end">
+            <vc:culture-switcher />
             @await Component.InvokeAsync("CultureSwitcher")
-        @*<ThemeController></ThemeController>*@
+            @*<ThemeController></ThemeController>*@
+        </div>
     </div>
-</div>
-<div class="container mx-auto">
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <div class="bg-base-200 flex flex-col items-center">
-            <div class="p-4"><img src="~/images/about.jpg" alt="about" class="max-w-48 rounded-lg"/></div>
-            <div class="prose-xl px-14">
-                <p>
-                    @SharedLocalizer["self-introduction"]
-                </p>
+    <div class="container mx-auto">
+        <div class="grid min-h-screen grid-cols-1 gap-4 md:grid-cols-4">
+            <div class="bg-base-200 flex flex-col items-center">
+                <div class="p-4"><img src="~/images/about.jpg" alt="about" class="max-w-48 rounded-lg" /></div>
+                <div class="prose-xl px-14">
+                    <p>
+                        @SharedLocalizer["self-introduction"]
+                    </p>
+                </div>
+            </div>
+            <div class="col-span-2">
+                @RenderBody()
             </div>
         </div>
-        <div class="col-span-2">
-            @RenderBody()
-        </div>
     </div>
-</div>
 
-
-<footer class="footer bg-neutral text-neutral-content fixed bottom-0 flex items-baseline justify-center p-2">
-    <div>
+    <footer class="footer bg-neutral text-neutral-content fixed bottom-0 flex items-baseline justify-center p-2">
+        <div>
             <p>Copyright © @(DateTime.Today.Year) - All right reserved</p>
-    </div>
-    <div class="flex gap-3">
-        <a href="https://github.com/clock1998" aria-label="asd"><i class="fa-brands fa-github fa-lg"></i></a>
-        <a href="https://www.linkedin.com/in/linyi-jiang/" aria-label="asd"><i class="fa-brands fa-linkedin fa-lg"></i></a>
-    </div>
-</footer>
+        </div>
+        <div class="flex gap-3">
+            <a href="https://github.com/clock1998" aria-label="asd"><i class="fa-brands fa-github fa-lg"></i></a>
+            <a href="https://www.linkedin.com/in/linyi-jiang/" aria-label="asd"><i class="fa-brands fa-linkedin fa-lg"></i></a>
+        </div>
+    </footer>
 </body>
 </html>

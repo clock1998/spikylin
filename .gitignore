@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Spikylin/wwwroot/tailwind.css
+/Spikylin/wwwroot/site.output.css

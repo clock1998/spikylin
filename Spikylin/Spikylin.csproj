@@ -20,10 +20,6 @@
 	<UpToDateCheckBuilt Include="wwwroot/site.css" Set="Css" />
 	<UpToDateCheckBuilt Include="wwwroot/tailwind.config.js" Set="Css" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages\Post\" />
-  </ItemGroup>
 	
   <Target Name="TailwindDevelopment" BeforeTargets="Compile" Condition="'$(Configuration)' != 'Release'">
 	<Exec Command="npm run build:css" />

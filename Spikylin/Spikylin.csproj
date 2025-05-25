@@ -21,6 +21,10 @@
 	<UpToDateCheckBuilt Include="wwwroot/site.css" Set="Css" />
 	<UpToDateCheckBuilt Include="wwwroot/tailwind.config.js" Set="Css" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Pages\About\" />
+  </ItemGroup>
 	
   <Target Name="TailwindDevelopment" BeforeTargets="Compile" Condition="'$(Configuration)' != 'Release'">
 	<Exec Command="npx tailwindcss -i ./wwwroot/site.css -o ./wwwroot/tailwind.css" />

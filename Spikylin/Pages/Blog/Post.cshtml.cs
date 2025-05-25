@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spikylin.Infrastructure.Helper;
 using Spikylin.Model;
 
-namespace Spikylin.Pages
+namespace Spikylin.Pages.Blog
 {
     public class PostModel : PageModel
     {

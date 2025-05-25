@@ -1,0 +1,19 @@
+﻿@inject IStringLocalizer<SharedResources> SharedLocalizer
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<div class="container mx-auto">
+    <div class="grid min-h-screen grid-cols-1 gap-4 md:grid-cols-4">
+        <div class="bg-base-200 flex flex-col items-center">
+            <div class="p-4"><img src="~/images/about.jpg" alt="about" class="max-w-48 rounded-lg" /></div>
+            <div class="prose-xl px-14">
+                <p>
+                    @SharedLocalizer["self-introduction"]
+                </p>
+            </div>
+        </div>
+        <div class="col-span-2">
+            @RenderBody()
+        </div>
+    </div>
+</div>

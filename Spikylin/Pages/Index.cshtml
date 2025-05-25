@@ -1,41 +1,5 @@
 ﻿@page
-@model IndexModel
-@inject IStringLocalizer<IndexModel> Localizer
+@model Spikylin.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home";
+    Layout = "_Layout";
 }
-<div class="mx-auto my-3 max-w-4xl">
-    <div class="flex flex-wrap items-start justify-start gap-1">
-        @foreach (var tag in Model.Tags)
-        {
-            <button class="btn btn-sm"
-                    hx-get="Index?handler=FilterPosts&tag=@tag"
-                    hx-target="#posts"
-                    hx-swap="outerHTML">
-                <span class="surface-4">&num;@Html.DisplayFor(n => tag)</span>
-            </button>
-        }
-    </div>
-    <div class="divider text-2xl font-semibold">@Localizer["Featured"]</div>
-    <ul class="list">
-        @foreach (var doc in Model.Posts.Where(n => n.Markdown.Meta.Featured))
-        {
-            <a asp-page="/Post" asp-route-fileName="@doc.FileName">
-            <li class="list-row">
-                <div class="prose">
-                    <h4>[@doc.Markdown.Meta.Date.ToShortDateString()] @doc.Markdown.Meta.Title</h4>
-                    <p>@doc.Markdown.Meta.Description</p>
-                    <div>
-                            @foreach (var tag in doc.Markdown.Meta.Tags)
-                            {
-                                <span class="px-1">&num;@tag</span>
-                            }
-                    </div>
-                </div>
-            </li>
-            </a>
-        }
-    </ul>
-    <div class="divider text-2xl font-semibold">@Localizer["Posts"]</div>
-    <partial name="_PostsPartial" model="Model.Posts" />
-</div>

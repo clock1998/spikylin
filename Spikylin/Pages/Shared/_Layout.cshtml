@@ -1,7 +1,6 @@
 ﻿@using Spikylin.Pages.Shared
 @using System.Globalization
 
-@inject IStringLocalizer<SharedResources> SharedLocalizer
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,7 +39,7 @@
         </div>
 
         <div class="navbar-center hidden lg:flex">
-            <a class="py-1" asp-area="" asp-page="/Index">Blog</a>
+            <a class="py-1" asp-area="" asp-page="/Blog/Index">Blog</a>
             <a class="py-1" asp-area="" asp-page="/About/Index">About</a>
         </div>
 
@@ -50,22 +49,7 @@
             @*<ThemeController></ThemeController>*@
         </div>
     </div>
-    <div class="container mx-auto">
-        <div class="grid min-h-screen grid-cols-1 gap-4 md:grid-cols-4">
-            <div class="bg-base-200 flex flex-col items-center">
-                <div class="p-4"><img src="~/images/about.jpg" alt="about" class="max-w-48 rounded-lg" /></div>
-                <div class="prose-xl px-14">
-                    <p>
-                        @SharedLocalizer["self-introduction"]
-                    </p>
-                </div>
-            </div>
-            <div class="col-span-2">
-                @RenderBody()
-            </div>
-        </div>
-    </div>
-
+    @RenderBody()
     <footer class="footer bg-neutral text-neutral-content fixed bottom-0 flex items-baseline justify-center p-2">
         <div>
             <p>Copyright © @(DateTime.Today.Year) - All right reserved</p>

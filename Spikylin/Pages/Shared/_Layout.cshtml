@@ -31,16 +31,20 @@
                 </div>
                 <div tabindex="0" class="dropdown-content card bg-base-200 z-[1] p-2 shadow">
                     <div class="card-body p-1 no-underline">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        <a class="py-1" asp-area="" asp-page="/About/Index">About</a>
+                        <a asp-area="" asp-page="/Index">Home</a>
+                        <a asp-area="" asp-page="/Blog/Index">Blog</a>
+                        <a asp-area="" asp-page="/About/Index">About</a>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="navbar-center hidden lg:flex">
-            <a class="py-1" asp-area="" asp-page="/Blog/Index">Blog</a>
-            <a class="py-1" asp-area="" asp-page="/About/Index">About</a>
+            <ul class="menu menu-horizontal px-1">
+                <li><a asp-area="" asp-page="/Index">Home</a></li>
+                <li><a asp-area="" asp-page="/Blog/Index">Blog</a></li>
+                <li><a asp-area="" asp-page="/About/Index">About</a></li>
+            </ul>
         </div>
 
         <div class="navbar-end">

@@ -15,5 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      working-directory: ./Spikylin
-      run: docker build . --file Dockerfile --tag spikylin:$(date +%s)
+      run: docker build . --file ./Spikylin/Dockerfile --tag spikylin:$(date +%s)

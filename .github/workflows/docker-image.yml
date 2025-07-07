@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Stop docker container
-      run: docker compose down ./Spikylin/docker-compose.yml
+      run: docker compose down 
       
     - name: Build the Docker image
-      run: docker compose build ./Spikylin/docker-compose.yml -d 
+      run: docker compose build

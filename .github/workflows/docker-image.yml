@@ -17,9 +17,6 @@ jobs:
     
     - name: Stop docker container
       run: docker compose -f ./Spikylin/docker-compose.yml down 
-      
-    - name: Build the Docker image
-      run: docker compose -f ./Spikylin/docker-compose.yml build
 
     - name: Build the Docker image
       run: docker compose -f ./Spikylin/docker-compose.yml up -d

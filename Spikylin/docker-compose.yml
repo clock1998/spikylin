@@ -10,7 +10,7 @@ services:
       - tunnel
     ports:
       - 80:80
-    container_name: spikylin.com
+    container_name: spikylin
     restart: always
 
 # docker compose -p services up -d

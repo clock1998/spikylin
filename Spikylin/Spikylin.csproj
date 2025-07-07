@@ -19,7 +19,6 @@
 
   <ItemGroup>
 	<UpToDateCheckBuilt Include="wwwroot/site.css" Set="Css" />
-	<UpToDateCheckBuilt Include="wwwroot/tailwind.config.js" Set="Css" />
   </ItemGroup>
 
   <ItemGroup>

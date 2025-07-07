@@ -5,14 +5,14 @@
 <ul class="list" id="posts">
 	@foreach (var post in Model)
 	{
-		<a asp-page="/Post" asp-route-fileName="@post.FileName">
+		<a asp-page="./Post" asp-route-fileName="@post.FileName">
 			<li class="list-row">
 				<div class="prose">
 				<p>[@post.Markdown.Meta.Date.ToShortDateString()] @post.Markdown.Meta.Title</p>
-						@foreach (var tag in post.Markdown.Meta.Tags)
-						{
+					@foreach (var tag in post.Markdown.Meta.Tags)
+					{
 						<span class="px-1">&num;@tag</span>
-						}
+					}
 				</div>
 			</li>
 		</a>

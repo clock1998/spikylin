@@ -10,9 +10,13 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
 
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Stop docker container
+      run: docker compose down ./Spikylin/docker-compose.yml
+      
     - name: Build the Docker image
-      run: docker build . --file ./Spikylin/Dockerfile --tag spikylin:$(date +%s)
+      run: docker compose build ./Spikylin/docker-compose.yml -d 

@@ -9,7 +9,7 @@ services:
     networks:
       - tunnel
     ports:
-      - 8080:80
+      - 8081:80
     container_name: spikylin
     restart: always
 

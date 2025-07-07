@@ -10,6 +10,9 @@ services:
       - tunnel
     ports:
       - 80:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=80
     container_name: spikylin
     restart: always
 

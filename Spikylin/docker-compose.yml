@@ -4,8 +4,8 @@ networks:
 services:
   spikylin:
     build: 
-      context: .
-      dockerfile: ./Spikylin/Dockerfile
+      context: ../
+      dockerfile: ./Dockerfile
     networks:
       - tunnel
     ports:

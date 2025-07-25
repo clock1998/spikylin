@@ -55,3 +55,23 @@ sudo dpkg-reconfigure -plow unattended-upgrades
 sudo systemctl restart unattended-upgrades
 which unattended-upgrades
 ```
+
+## How to generate a ssh key? (MacOS)
+``` shellscript
+ssh-keygen -o -a 100 -t ed25519 -f ./.ssh/homeserver -C example@gmail.com
+```
+
+## How to upload ssh key to remote server? (MacOS)
+``` shellscript
+ssh-copy-id -i ./.ssh/homeserver username@192.168.1.4
+```
+
+## How to test ansible host connection
+``` shellscript
+ansible all -m ping --ask-vault-pass
+```
+
+## How to run ansible playbook?
+``` shellscript
+ansible-playbook run.yml -K --ask-vault-pass\
+```

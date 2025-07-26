@@ -15,7 +15,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+    - name: clear cache
+      run: docker builder prune -f
+      
     - name: Stop docker container
       run: docker compose -f ./Spikylin/docker-compose.yml down 
 

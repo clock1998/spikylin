@@ -73,5 +73,5 @@ ansible all -m ping --ask-vault-pass
 
 ## How to run ansible playbook?
 ``` shellscript
-ansible-playbook run.yml -K --ask-vault-pass\
+ansible-playbook run.yml -K --ask-vault-pass
 ```

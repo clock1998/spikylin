@@ -5,7 +5,7 @@ date: '2025-06-28'
 tags: 
     - Woodworking
 published: true
-featured: true
+featured: false
 ---
 # Garage Shelf
 

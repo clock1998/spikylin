@@ -67,3 +67,11 @@ A bridge is like a switch. There are serveral ports on a router and usually each
     Go to the Action tab.
     Choose masquerade.
     Apply and OK.
+
+## How to do port forwarding? 
+
+1. Add a new dis-nat rule 
+2. Add Dis. Port, port protocol, and In. Interface.
+3. Switch to Action, set action as dst-nat, add To Addresses and To ports. 
+4. Add a Hairpin Nat to access a server within local network through public IP and port. 
+5. Add Src. Address (192.168.1.0/24) and Dst. Address (192.168.1.1). Add Protocol. Add masquerade as action.

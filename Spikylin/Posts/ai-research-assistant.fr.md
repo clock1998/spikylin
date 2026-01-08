@@ -9,21 +9,15 @@ published: true
 featured: false
 ---
 
-The goal of the [ai-research-assistant](https://github.com/clock1998/ai-research-assistant) to make the experience of searching academic papers more human like, more like a human conversation. The project contains a API and also an web UI. I used Hugging Face for all the AI pipelines. 
+Le but de ai-research-assistant est de rendre l'expérience de recherche d'articles académiques plus humaine, semblable à une conversation réelle. Le projet comprend une API ainsi qu'une interface web (UI). J'ai utilisé Hugging Face pour l'ensemble des pipelines d'IA.
 
-The UI is powered by gradio. The API is powered by FastAPI. The Web UI includes a chat window and both text and audio input and output. On a high level, the system works like this: when a user send a voice chat, Whisper will process the voice message to text. The The LLM will take the text and convert it to a Arxiv search query. The LLM will also execute the search query. The system will take the first 50 search result and send to a re-ranking model, because the search query is very basic keyword search. The model will calculate a relevance score based on the original user question and summary of each query results. The system will sort the search result based on the relevance score in a descending order. The system will then take the first three articles and summarize them again to output a shorter version of the summary along with the article link. The final output is also sent to a TTS engine. I used gTTS here. Lastly, the AI assistant will upload the response to Notion using the notion integration API.
+L'interface utilisateur est propulsée par Gradio, tandis que l'API fonctionne sous FastAPI. L'interface web inclut une fenêtre de chat avec des entrées et sorties textuelles et audio. De manière générale, le système fonctionne ainsi : lorsqu'un utilisateur envoie un message vocal, Whisper convertit la voix en texte. Le LLM prend ensuite ce texte pour générer une requête de recherche Arxiv, puis exécute cette requête. Le système récupère les 50 premiers résultats et les envoie à un modèle de ré-ordonnancement (re-ranking), car la recherche initiale est une simple recherche par mots-clés. Le modèle calcule un score de pertinence basé sur la question originale de l'utilisateur et le résumé de chaque résultat. Le système trie ensuite les résultats par score de pertinence décroissant. Enfin, il sélectionne les trois premiers articles et les résume à nouveau pour fournir une version courte accompagnée du lien de l'article. La réponse finale est envoyée à un moteur TTS (gTTS dans ce cas). Pour finir, l'assistant IA télécharge la réponse sur Notion via l'API d'intégration Notion.
 
-```mermaid
-graph TD;
-    Whisper-->LLM-->Arxiv[Arxiv Query]-->Re[Re-rank Model]-->|Take First three|Summarize[LLM Summarize]-->Response-->TTS
-```
-## Future Work
+## Travaux futurs
+J'ai deux projets pour la suite. Je réfléchis à transformer l'assistant IA en un MCP (Model Context Protocol). Cela permettrait d'augmenter l'ergonomie et l'accessibilité de l'assistant. L'autre projet consiste à en faire un agent. Cela pourrait améliorer encore les performances, car il serait capable de s'auto-inciter (self-prompt) pour trouver les articles les plus pertinents.
 
-I have two plans for the project. I am thinking about making the AI assistant to a MCP. This will increase the usability and accessibility of the AI assistant. Another plan is to make an agent. This could further improve the performance of the AI assistant as it will self prompt to find the most relevance papers. 
-
-## Issues
-
-I noticed that the open source LLM, Llama-3.1-8B-Instruct, in this case, does not always generate the perfect JSON format data. There are several potential solutions according to my research. The easiest one is to use a commercial model which will include a parameter to set the wanted output format. Then, I could also implement a fallback function, so when the format is not correct, the fallback function will simply redo the prompt. Lastly, there are tools that could restrict the output like [Outlines](https://github.com/dottxt-ai/outlines).
+## Problèmes rencontrés
+J'ai remarqué que le modèle LLM open source utilisé ici, Llama-3.1-8B-Instruct, ne génère pas toujours des données au format JSON parfait. D'après mes recherches, il existe plusieurs solutions potentielles. La plus simple est d'utiliser un modèle commercial incluant un paramètre pour définir le format de sortie souhaité. Je pourrais également implémenter une fonction de secours (fallback) : si le format est incorrect, la fonction relance simplement le prompt. Enfin, il existe des outils permettant de contraindre la sortie, comme Outlines.
 
 ## Interesting code snippets  
 

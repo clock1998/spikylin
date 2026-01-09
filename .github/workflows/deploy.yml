@@ -63,9 +63,9 @@ jobs:
         run: |
           IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.tag.outputs.tag }}
           echo "Deploying with compose, image hint: $IMAGE"
+          export TAG=${{ steps.tag.outputs.tag }}
           export COMPOSE_DOCKER_CLI_BUILD=1
           export DOCKER_BUILDKIT=1
-          # Use the repo's compose file which builds from the project Dockerfile
           docker compose -f Spikylin/docker-compose.yml -p spikylin pull || true
           docker compose -f Spikylin/docker-compose.yml -p spikylin up -d --build --remove-orphans
 

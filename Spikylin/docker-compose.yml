@@ -3,6 +3,7 @@ networks:
         external: true
 services:
   spikylin:
+    image: ghcr.io//clock1998/spikylin:${TAG}
     networks:
       - tunnel
     ports:

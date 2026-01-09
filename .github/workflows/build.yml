@@ -42,6 +42,11 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
+            # Tag with the version (e.g. v1.0.0) when a git tag is pushed
+            type=semver,pattern={{version}}
+            # Tag with the major version (e.g. v1)
+            type=semver,pattern={{major}}
+            # Keep your existing tags
             type=raw,value=latest
             type=sha
 

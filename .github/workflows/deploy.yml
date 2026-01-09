@@ -1,0 +1,74 @@
+name: CD - Deploy tagged image
+
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to deploy (optional when manually triggered)'
+        required: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine image tag
+        id: tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG=${GITHUB_REF#refs/tags/}
+          elif [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG=${{ github.event.inputs.tag }}
+          else
+            TAG=latest
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Choose registry token
+        id: token
+        run: |
+          if [ -n "${{ secrets.PAT }}" ]; then
+            echo "token=${{ secrets.PAT }}" >> $GITHUB_OUTPUT
+          elif [ -n "${{ github.token }}" ]; then
+            echo "token=${{ github.token }}" >> $GITHUB_OUTPUT
+          else
+            echo "token=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ steps.token.outputs.token }}
+
+      - name: Pull image on runner (sanity)
+        run: |
+          IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.tag.outputs.tag }}
+          echo "Pulling $IMAGE"
+          docker pull "$IMAGE"
+
+      - name: Deploy with Docker Compose (on-runner)
+        run: |
+          IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.tag.outputs.tag }}
+          echo "Deploying with compose, image hint: $IMAGE"
+          export COMPOSE_DOCKER_CLI_BUILD=1
+          export DOCKER_BUILDKIT=1
+          # Use the repo's compose file which builds from the project Dockerfile
+          docker compose -f Spikylin/docker-compose.yml -p spikylin pull || true
+          docker compose -f Spikylin/docker-compose.yml -p spikylin up -d --build --remove-orphans
+
+      - name: Announce deployment
+        run: |
+          echo "Deployed: ${{ github.repository }}:${{ steps.tag.outputs.tag }}"

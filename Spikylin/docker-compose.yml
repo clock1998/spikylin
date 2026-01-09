@@ -3,9 +3,6 @@ networks:
         external: true
 services:
   spikylin:
-    build: 
-      context: ../
-      dockerfile: ./Spikylin/Dockerfile
     networks:
       - tunnel
     ports:

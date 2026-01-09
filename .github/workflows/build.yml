@@ -1,9 +1,5 @@
 name: Build and Push Image
 
-permissions:
-  contents: read
-  packages: write
-
 on:
   push:
     branches: [ "master", "main" ]

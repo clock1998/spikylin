@@ -1,5 +1,9 @@
 name: Build and Push Image
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     branches: [ "master", "main" ]
@@ -19,9 +23,6 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - uses: actions/checkout@v4

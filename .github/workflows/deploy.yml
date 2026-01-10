@@ -9,10 +9,6 @@ on:
         description: 'Image tag to deploy (optional when manually triggered)'
         required: false
 
-permissions:
-  contents: read
-  packages: read
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -61,13 +57,10 @@ jobs:
 
       - name: Deploy with Docker Compose (on-runner)
         run: |
-          IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.tag.outputs.tag }}
-          echo "Deploying with compose, image hint: $IMAGE"
           export TAG=${{ steps.tag.outputs.tag }}
           export COMPOSE_DOCKER_CLI_BUILD=1
           export DOCKER_BUILDKIT=1
-          docker compose -f Spikylin/docker-compose.yml -p spikylin pull || true
-          docker compose -f Spikylin/docker-compose.yml -p spikylin up -d --build --remove-orphans
+          docker compose -f Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
 
       - name: Announce deployment
         run: |

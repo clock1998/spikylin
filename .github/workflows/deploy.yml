@@ -55,6 +55,13 @@ jobs:
           echo "Pulling $IMAGE"
           docker pull "$IMAGE"
 
+      - name: Debug Docker Environment
+        run: |
+          echo "Current User: $(whoami)"
+          echo "Docker Context: $(docker context show)"
+          echo "Available Networks:"
+          docker network ls
+          
       - name: Deploy with Docker Compose (on-runner)
         run: |
           export TAG=${{ steps.tag.outputs.tag }}

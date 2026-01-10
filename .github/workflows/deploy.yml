@@ -34,9 +34,9 @@ jobs:
 
       # SSH Loopback Step
       - name: Deploy via SSH Loopback (localhost)
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.4
         with:
-          host: 172.17.0.1
+          host: 127.0.0.1
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           # Path to your project on the VM disk

@@ -1,6 +1,4 @@
-networks:
-      tunnel:
-        external: true
+
 services:
   spikylin:
     image: ghcr.io/clock1998/spikylin:${TAG}
@@ -14,4 +12,8 @@ services:
     container_name: spikylin
     restart: always
 
+networks:
+  tunnel:
+    external: true
+    name: tunnel
 # docker compose -p services up -d

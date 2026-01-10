@@ -1,58 +1,58 @@
-name: CD - Deploy tagged image
+# name: CD - Deploy tagged image
 
-on:
-  push:
-    tags: [ 'v*.*.*' ]
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Image tag to deploy'
-        required: false
+# on:
+#   push:
+#     tags: [ 'v*.*.*' ]
+#   workflow_dispatch:
+#     inputs:
+#       tag:
+#         description: 'Image tag to deploy'
+#         required: false
 
-jobs:
-  deploy:
-    # Use your self-hosted runner
-    runs-on: self-hosted 
-    env:
-      REGISTRY: ghcr.io
+# jobs:
+#   deploy:
+#     # Use your self-hosted runner
+#     runs-on: self-hosted 
+#     env:
+#       REGISTRY: ghcr.io
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
 
-      - name: Determine image tag
-        id: tag
-        run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            TAG=${GITHUB_REF#refs/tags/}
-          elif [ -n "${{ github.event.inputs.tag }}" ]; then
-            TAG=${{ github.event.inputs.tag }}
-          else
-            TAG=latest
-          fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+#       - name: Determine image tag
+#         id: tag
+#         run: |
+#           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+#             TAG=${GITHUB_REF#refs/tags/}
+#           elif [ -n "${{ github.event.inputs.tag }}" ]; then
+#             TAG=${{ github.event.inputs.tag }}
+#           else
+#             TAG=latest
+#           fi
+#           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      # SSH Loopback Step
-      - name: Deploy via SSH Loopback (localhost)
-        uses: appleboy/ssh-action@v1.2.4
-        with:
-          host: 127.0.0.1
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # Path to your project on the VM disk
-          script: |
-            # 1. Log in to GHCR as the target user
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+#       # SSH Loopback Step
+#       - name: Deploy via SSH Loopback (localhost)
+#         uses: appleboy/ssh-action@v1.2.4
+#         with:
+#           host: 127.0.0.1
+#           username: ${{ secrets.SERVER_USER }}
+#           key: ${{ secrets.SSH_PRIVATE_KEY }}
+#           # Path to your project on the VM disk
+#           script: |
+#             # 1. Log in to GHCR as the target user
+#             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             
-            # 2. Export variables for Compose
-            export TAG=${{ steps.tag.outputs.tag }}
-            export IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:$TAG
+#             # 2. Export variables for Compose
+#             export TAG=${{ steps.tag.outputs.tag }}
+#             export IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:$TAG
             
-            # 3. Pull and Deploy
-            # Note: We use the absolute path to your docker-compose file
-            docker pull $IMAGE
-            docker compose -f ${{ github.workspace }}/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
+#             # 3. Pull and Deploy
+#             # Note: We use the absolute path to your docker-compose file
+#             docker pull $IMAGE
+#             docker compose -f ${{ github.workspace }}/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
 
-      - name: Announce deployment
-        run: |
-          echo "Successfully deployed ${{ github.repository }}:${{ steps.tag.outputs.tag }} via SSH loopback"
+#       - name: Announce deployment
+#         run: |
+#           echo "Successfully deployed ${{ github.repository }}:${{ steps.tag.outputs.tag }} via SSH loopback"

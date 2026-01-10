@@ -42,13 +42,12 @@ jobs:
             type=semver,pattern=v{{version}}
             # Keep your existing tags
             type=raw,value=latest
-            type=sha
+            # type=sha
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./Spikylin
-          platforms: linux/amd64
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -78,7 +77,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./Spikylin
-          platforms: linux/amd64
           push: true
           tags: ${{ needs.build.outputs.tags }}
           labels: ${{ needs.build.outputs.labels }}

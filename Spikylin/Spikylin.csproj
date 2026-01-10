@@ -24,7 +24,23 @@
   <ItemGroup>
     <Folder Include="Resources\Pages\About\" />
   </ItemGroup>
-	
+
+  <ItemGroup>
+    <None Update="Pages\content.fr.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Pages\content.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Ensure all files under Posts are copied to output with PreserveNewest -->
+  <ItemGroup>
+    <None Update="Posts\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Target Name="TailwindDevelopment" BeforeTargets="Compile" Condition="'$(Configuration)' != 'Release'">
 	<Exec Command="npx tailwindcss -i ./wwwroot/site.css -o ./wwwroot/tailwind.css" />
   </Target>

@@ -1,6 +1,6 @@
 ---
-title : A Simple Experiment: An AI Research Assistant Powered by Arxiv  
-description:  An experiment project that demonstrates a simple AI research assistant implementation using LLM, Gradio, Hugging Face, and Python
+title: 'A Simple Experiment: An AI Research Assistant Powered by Arxiv'
+description: An experiment project that demonstrates a simple AI research assistant implementation using LLM, Gradio, Hugging Face, and Python
 date: '2025-12-30'
 tags: 
     - AI

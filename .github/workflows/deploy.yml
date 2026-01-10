@@ -6,12 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Image tag to deploy (optional when manually triggered)'
+        description: 'Image tag to deploy'
         required: false
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # Use your self-hosted runner
+    runs-on: self-hosted 
     env:
       REGISTRY: ghcr.io
 
@@ -31,44 +32,27 @@ jobs:
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Choose registry token
-        id: token
-        run: |
-          if [ -n "${{ secrets.PAT }}" ]; then
-            echo "token=${{ secrets.PAT }}" >> $GITHUB_OUTPUT
-          elif [ -n "${{ github.token }}" ]; then
-            echo "token=${{ github.token }}" >> $GITHUB_OUTPUT
-          else
-            echo "token=" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
+      # SSH Loopback Step
+      - name: Deploy via SSH Loopback (localhost)
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ steps.token.outputs.token }}
-
-      - name: Pull image on runner (sanity)
-        run: |
-          IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.tag.outputs.tag }}
-          echo "Pulling $IMAGE"
-          docker pull "$IMAGE"
-
-      - name: Debug Docker Environment
-        run: |
-          echo "Current User: $(whoami)"
-          echo "Docker Context: $(docker context show)"
-          echo "Available Networks:"
-          docker network ls
-          
-      - name: Deploy with Docker Compose (on-runner)
-        run: |
-          export TAG=${{ steps.tag.outputs.tag }}
-          export COMPOSE_DOCKER_CLI_BUILD=1
-          export DOCKER_BUILDKIT=1
-          docker compose -f Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
+          host: 127.0.0.1
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # Path to your project on the VM disk
+          script: |
+            # 1. Log in to GHCR as the target user
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            
+            # 2. Export variables for Compose
+            export TAG=${{ steps.tag.outputs.tag }}
+            export IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:$TAG
+            
+            # 3. Pull and Deploy
+            # Note: We use the absolute path to your docker-compose file
+            docker pull $IMAGE
+            docker compose -f /home/${{ secrets.SERVER_USER }}/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
 
       - name: Announce deployment
         run: |
-          echo "Deployed: ${{ github.repository }}:${{ steps.tag.outputs.tag }}"
+          echo "Successfully deployed ${{ github.repository }}:${{ steps.tag.outputs.tag }} via SSH loopback"

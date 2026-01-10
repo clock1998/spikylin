@@ -51,7 +51,7 @@ jobs:
             # 3. Pull and Deploy
             # Note: We use the absolute path to your docker-compose file
             docker pull $IMAGE
-            docker compose -f /home/${{ secrets.SERVER_USER }}/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
+            docker compose -f ${{ github.workspace }}/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
 
       - name: Announce deployment
         run: |

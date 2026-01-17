@@ -1,0 +1,15 @@
+---
+title : 'Building a Domestic Business Categorizer'
+description: Hardware
+date: '2026-01-16'
+updated: '202'
+tags: 
+    - HomeLab
+    - DevOps
+published: true
+featured: true
+---
+
+While I am working on a personal budgeting project, I have encountered a problem: it is very challenging to categorize transaction automatically using AI while maintain high accuracy. Many business names are not relevant to its economic activity such as Apple. Business names are used more often as a marketing tool nowadays. The problem becomes even more prominent when a transaction is done with a local business. For example, Kim Phat is an asian grocery shop only exists in Quebec, and its name has nothing to do with grocery. Furthermore, many business names in Quebec are in French which makes the auto categorization even more difficult. 
+
+After research, there are a few solutions. The easiest solution is to use a more intelligent AI model (which is a model with more parameters). However, I will not go with this solution as it requires either very expensive hardware to run to pay for one of the cloud API provided by OpenAI or other providers. But even with the cloud provider, the speed is not satisfaction. The second option is to find an public API which can search a business by its name and then returns its category or business description. After some research, I could not find such public APIs. Although the Quebec government provides a website to search for a business, it is not in a format of API. However, it is possible to develop a web crawler to utilize the website, but it will impact the speed and potentially cause legal issues. The third solution is to choose a zero short model and using SFT technics to teach teach the model to recognize all the domestic businesses. Although this solution also requires additional resources such powerful hardware and high quality dataset, it is very feasible. It is my plan B as I have limited experience with SFT thus a good final result is not guaranteed. The last solution is to use RAG hybrid approach. I think this requires the least amount of resource but should provide high quality result. I will first need to build a high quality embeddings using the dataset I have found online from [Donne Quebec](https://www.donneesquebec.ca/recherche/dataset/registre-des-entreprises). The dataset contains business name and description. I will then perform semantic search which will find a correct business description. Then, I will perform a zero shot classification which should put the business into a good personal budget category. The reason that I do not label each business activity when I create embeddings is that I will loose flexibility there. For example, if someone else want to use my tool, with zero shot he just could pass his personalized categories even in different languages.  

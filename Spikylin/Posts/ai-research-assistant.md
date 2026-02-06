@@ -15,7 +15,7 @@ The UI is powered by gradio. The API is powered by FastAPI. The Web UI includes 
 
 ```mermaid
 graph TD;
-    Whisper-->LLM-->Arxiv[Arxiv Query]-->Re[Re-rank Model]-->|Take First three|Summarize[LLM Summarize]-->Response-->TTS
+    Whisper-->LLM-->Arxiv[Arxiv Query]-->Re[Re-rank Model]-->|Take First three|Summarize[LLM Summarize]-->Response-->TTS;
 ```
 ## Future Work
 

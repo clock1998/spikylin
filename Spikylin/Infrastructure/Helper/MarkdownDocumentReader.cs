@@ -3,6 +3,8 @@ using Markdig.Syntax;
 using Markdig;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using System.Text.RegularExpressions;
+using System.Net;
 
 namespace Spikylin.Infrastructure.Helper
 {
@@ -57,6 +59,20 @@ namespace Spikylin.Infrastructure.Helper
 
             // 3) render HTML (ignores the front-matter block by default)
             var html = Markdig.Markdown.ToHtml(markdown, pipeline);
+
+            // Convert fenced mermaid code blocks into <div class="mermaid"> so
+            // client-side Mermaid can detect and render them. Markdig renders
+            // fenced code blocks as <pre><code class="language-mermaid">..</code></pre>,
+            // so replace that with an unencoded div containing the original code.
+            html = Regex.Replace(html,
+                @"<pre[^>]*>\s*<code[^>]*class=""[^""]*mermaid[^""]*""[^>]*>(.*?)</code>\s*</pre>",
+                m =>
+                {
+                    var codeHtml = m.Groups[1].Value;
+                    var decoded = WebUtility.HtmlDecode(codeHtml);
+                    return $"<div class=\"mermaid\">{decoded}</div>";
+                },
+                RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
             return new Markdown
             {

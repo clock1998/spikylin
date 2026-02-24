@@ -35,11 +35,12 @@ namespace Spikylin.Pages.Blog
         private void LoadPosts()
         {
             Posts.Clear();
-            var cultureName = CultureInfo.CurrentCulture.Name;
+            var cultureShortName = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             var contentPath = Path.Combine(_env.ContentRootPath, "Posts");
             if (Directory.Exists(contentPath))
             {
-                var files = cultureName == "en" ? Directory.GetFiles(contentPath, "*.md", SearchOption.AllDirectories) : Directory.GetFiles(contentPath, "*.fr.md", SearchOption.AllDirectories);
+                var searchPattern = cultureShortName.Equals("fr", StringComparison.OrdinalIgnoreCase) ? "*.fr.md" : "*.md";
+                var files = Directory.GetFiles(contentPath, searchPattern, SearchOption.AllDirectories);
                 foreach (var file in files)
                 {
                     var markdownContent = System.IO.File.ReadAllText(file);

@@ -18,12 +18,14 @@
     </div>
     <div class="divider text-2xl font-semibold">@Localizer["Featured"]</div>
     <ul class="list">
-        @foreach (var doc in Model.Posts.Where(n => n.Markdown.Meta.Featured))
+        @foreach (var doc in Model.Posts
+        .Where(n => n.Markdown.Meta.Featured)
+        .OrderByDescending(n => n.Markdown.Meta.Date))
         {
             <a asp-page="./Post" asp-route-fileName="@doc.FileName">
             <li class="list-row">
                 <div class="prose">
-                    <h4>[@doc.Markdown.Meta.Date.ToShortDateString()] @doc.Markdown.Meta.Title</h4>
+                    <h4>[@doc.Markdown.Meta.Date.ToString("yyyy-MM-dd")] @doc.Markdown.Meta.Title</h4>
                     <p>@doc.Markdown.Meta.Description</p>
                     <div>
                         @foreach (var tag in doc.Markdown.Meta.Tags)

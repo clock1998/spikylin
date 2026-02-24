@@ -47,6 +47,7 @@ namespace Spikylin.Pages.Blog
                     var markdown = MarkdigMarkdownParser.Parse(markdownContent);
                     Posts.Add(new Post { FileName = Path.GetFileNameWithoutExtension(file), Markdown = markdown });
                 }
+                Posts = Posts.Where(n => n.Markdown.Meta.Published).OrderByDescending(n => n.Markdown.Meta.Date).ToList();
             }
         }
     }

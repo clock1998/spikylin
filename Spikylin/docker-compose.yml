@@ -3,7 +3,7 @@ services:
   spikylin:
     image: ghcr.io/clock1998/spikylin:${TAG}
     networks:
-      - tunnel
+      - cloudflared-network-spikylin
     ports:
       - 80:80
     environment:
@@ -12,8 +12,17 @@ services:
     container_name: spikylin
     restart: always
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: sh -c 'tunnel --no-autoupdate run --token "$CLOUDFLARED_SPIKYLIN_TOKEN"'
+    container_name: cloudflared-tunnel-spikylin
+    restart: always
+    environment:
+      - CLOUDFLARED_SPIKYLIN_TOKEN=${cloudflared-spikylin-token}
+    networks:
+      - cloudflared-network-spikylin
+
 networks:
-  tunnel:
-    external: true
-    name: tunnel
+  cloudflared-network-spikylin:
+    driver: bridge
 # docker compose -p services up -d

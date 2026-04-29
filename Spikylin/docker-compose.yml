@@ -14,11 +14,11 @@ services:
 
   cloudflared:
     image: cloudflare/cloudflared:latest
-    command: sh -c 'tunnel --no-autoupdate run --token "$CLOUDFLARED_SPIKYLIN_TOKEN"'
+    command: tunnel --no-autoupdate run
     container_name: cloudflared-tunnel-spikylin
     restart: always
     environment:
-      - CLOUDFLARED_SPIKYLIN_TOKEN=${cloudflared-spikylin-token}
+      - TUNNEL_TOKEN=${cloudflared-spikylin-token}
     networks:
       - cloudflared-network-spikylin
 

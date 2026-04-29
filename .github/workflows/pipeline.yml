@@ -109,12 +109,6 @@ jobs:
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Copy docker-compose.yml to remote server
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null Spikylin/docker-compose.yml ${{ secrets.SERVER_USER }}@192.168.1.4:~/spikylin/docker-compose.yml
 
       - name: Deploy via SSH Loopback (localhost)
         uses: appleboy/ssh-action@v1.2.4
@@ -123,11 +117,16 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            if [ ! -d "~/spikylin/.git" ]; then
+              git clone https://github.com/${{ github.repository }}.git ~/spikylin
+            else
+              cd ~/spikylin && git pull
+            fi
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             export TAG=${{ steps.tag.outputs.tag }}
             export IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:$TAG
             docker pull $IMAGE
-            docker compose -f ~/spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
+            docker compose -f ~/spikylin/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
 
       - name: Announce deployment
         run: |

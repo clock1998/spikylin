@@ -18,7 +18,7 @@ services:
     container_name: cloudflared-tunnel-spikylin
     restart: always
     environment:
-      - TUNNEL_TOKEN=${cloudflared-spikylin-token}
+      - TUNNEL_TOKEN=${CLOUDFLARED_SPIKYLIN_TOKEN}
     networks:
       - cloudflared-network-spikylin
 

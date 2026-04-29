@@ -125,6 +125,7 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             export TAG=${{ steps.tag.outputs.tag }}
             export IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:$TAG
+            export CLOUDFLARED_SPIKYLIN_TOKEN="${{ secrets.CLOUDFLARED_SPIKYLIN_TOKEN }}"
             docker pull $IMAGE
             docker compose -f ~/spikylin/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
 

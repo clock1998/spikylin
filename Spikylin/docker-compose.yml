@@ -25,4 +25,5 @@ services:
 networks:
   cloudflared-network-spikylin:
     driver: bridge
+    name: cloudflared-network-spikylin
 # docker compose -p services up -d

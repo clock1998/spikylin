@@ -127,7 +127,7 @@ jobs:
             export IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:$TAG
             export CLOUDFLARED_SPIKYLIN_TOKEN="${{ secrets.CLOUDFLARED_SPIKYLIN_TOKEN }}"
             docker pull $IMAGE
-            docker compose -f ~/spikylin/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans
+            docker compose -f ~/spikylin/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans --force-recreate
 
       - name: Announce deployment
         run: |

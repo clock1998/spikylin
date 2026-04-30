@@ -57,8 +57,8 @@ jobs:
   push:
     runs-on: self-hosted
     needs: build
-    if: |
-      startsWith(github.ref, 'refs/tags/')
+    # if: |
+    #   startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v4
       
@@ -87,8 +87,8 @@ jobs:
   deploy:
     needs: push
     # Only run deploy on tag pushes or when a tag is provided to workflow_dispatch
-    if: |
-      startsWith(github.ref, 'refs/tags/') 
+    # if: |
+    #   startsWith(github.ref, 'refs/tags/') 
     runs-on: self-hosted
     env:
       REGISTRY: ghcr.io
@@ -110,24 +110,33 @@ jobs:
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
 
-      - name: Deploy via SSH Loopback (localhost)
+      - name: Deploy via SSH Loopback
+        uses: appleboy/ssh-action@v1.2.4
+        with:
+          host: 192.168.1.4
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Copy docker-compose.yml to remote server
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null Spikylin/docker-compose.yml ${{ secrets.SERVER_USER }}@192.168.1.4:$HOME/spikylin/docker-compose.yml
+
+      - name: Deploy via SSH Loopback
         uses: appleboy/ssh-action@v1.2.4
         with:
           host: 192.168.1.4
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            if [ ! -d "~/spikylin/.git" ]; then
-              git clone https://github.com/${{ github.repository }}.git ~/spikylin
-            else
-              cd ~/spikylin && git pull
-            fi
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             export TAG=${{ steps.tag.outputs.tag }}
             export IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:$TAG
             export CLOUDFLARED_SPIKYLIN_TOKEN="${{ secrets.CLOUDFLARED_SPIKYLIN_TOKEN }}"
             docker pull $IMAGE
-            docker compose -f ~/spikylin/Spikylin/docker-compose.yml -p spikylin up -d --remove-orphans --force-recreate
+            docker ps -aq --filter "name=spikylin" | xargs -r docker rm -f
+            docker compose -f $HOME/spikylin/docker-compose.yml -p spikylin up -d --remove-orphans --force-recreate
 
       - name: Announce deployment
         run: |

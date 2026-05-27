@@ -1,8 +1,17 @@
 ﻿@page
 @model Spikylin.Pages.IndexModel
+@inject IStringLocalizer<SharedResources> SharedLocalizer
 @{
     Layout = "_Layout";
 }
 <article class="prose container mx-auto max-w-4xl pb-10">
+    <div class="bg-base-200 flex flex-col items-center">
+        <div class="p-4"><img src="~/images/about.jpg" alt="about" class="max-w-48 rounded-lg" /></div>
+        <div class="prose-xl px-14">
+            <p>
+                @SharedLocalizer["self-introduction"]
+            </p>
+        </div>
+    </div>
     @Html.Raw(@Model.Html)
 </article>

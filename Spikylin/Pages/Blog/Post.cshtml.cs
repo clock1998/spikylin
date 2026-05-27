@@ -21,7 +21,7 @@ namespace Spikylin.Pages.Blog
         public void OnGet(string fileName)
         {
             // Use the fileName to locate and load the document.
-            var contentPath = Path.Combine(_env.ContentRootPath, "Posts");
+            var contentPath = Path.Combine(_env.ContentRootPath, "BlogPosts");
             var filePath = Path.Combine(contentPath, fileName + ".md");
             if (System.IO.File.Exists(filePath))
             {

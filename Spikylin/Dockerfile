@@ -34,10 +34,15 @@ RUN dotnet publish "Spikylin.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:
 
 # Final image (create non-root user)
 FROM base AS final
-ARG APP_UID=1000
-RUN adduser --disabled-password --gecos "" --uid $APP_UID appuser \
-    && chown -R appuser:appuser /app
 WORKDIR /app
+
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+EXPOSE 8080
+
 COPY --from=publish /app/publish .
-USER appuser
+
+USER $APP_UID
+
 ENTRYPOINT ["dotnet", "Spikylin.dll"]

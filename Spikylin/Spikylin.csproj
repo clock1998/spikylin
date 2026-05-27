@@ -36,7 +36,7 @@
 
   <!-- Ensure all files under Posts are copied to output with PreserveNewest -->
   <ItemGroup>
-    <None Update="Posts\**\*">
+    <None Update="BlogPosts\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

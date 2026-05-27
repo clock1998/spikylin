@@ -42,7 +42,7 @@ namespace Spikylin.Pages.Blog
         {
             Posts.Clear();
             var cultureShortName = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-            var contentPath = Path.Combine(_env.ContentRootPath, "Posts");
+            var contentPath = Path.Combine(_env.ContentRootPath, "BlogPosts");
             if (Directory.Exists(contentPath))
             {
                 var files = Directory.GetFiles(contentPath, "*.md", SearchOption.AllDirectories)

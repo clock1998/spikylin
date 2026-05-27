@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spikylin.Model;
 using Spikylin.Service;
 
-namespace Spikylin.Pages.Blog
+namespace Spikylin.Pages.Post
 {
     public class PostModel : PageModel
     {
@@ -17,7 +17,7 @@ namespace Spikylin.Pages.Blog
         }
 
         [BindProperty(SupportsGet = true)]
-        public required Post Post { get; set; }
+        public required Spikylin.Model.Post Post { get; set; }
         public void OnGet(string fileName)
         {
             // Use the fileName to locate and load the document.
@@ -27,7 +27,7 @@ namespace Spikylin.Pages.Blog
             {
                 var markdownContent = System.IO.File.ReadAllText(filePath);
                 var markdown = _markdownParser.Parse(markdownContent, filePath);
-                Post = new Post
+                Post = new Spikylin.Model.Post
                 {
                     FileName = fileName,
                     Markdown = markdown

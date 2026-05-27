@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Spikylin.Blog.Pages
+namespace Spikylin.Pages.Blog.Partials
 {
     public class PostsModel : PageModel
     {

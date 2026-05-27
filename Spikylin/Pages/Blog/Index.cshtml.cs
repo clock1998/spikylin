@@ -4,6 +4,7 @@ using Microsoft.Extensions.Localization;
 using Spikylin.Model;
 using Spikylin.Service;
 using System.Globalization;
+using PostModel = Spikylin.Model.Post;
 
 namespace Spikylin.Pages.Blog
 {
@@ -13,7 +14,7 @@ namespace Spikylin.Pages.Blog
         private readonly IWebHostEnvironment _env;
         private readonly IStringLocalizer<IndexModel> _localizer;
         private readonly IMarkdownService _markdownParser;
-        public List<Post> Posts { get; set; } = new List<Post>();
+        public List<PostModel> Posts { get; set; } = new List<PostModel>();
         public List<string> Tags => Posts.SelectMany(n => n.Markdown.Meta.Tags).Distinct().ToList();
         public IndexModel(
             ILogger<IndexModel> logger, 
@@ -54,7 +55,7 @@ namespace Spikylin.Pages.Blog
                 {
                     var markdownContent = System.IO.File.ReadAllText(file);
                     var markdown = _markdownParser.Parse(markdownContent, file);
-                    Posts.Add(new Post { FileName = Path.GetFileNameWithoutExtension(file), Markdown = markdown });
+                    Posts.Add(new PostModel { FileName = Path.GetFileNameWithoutExtension(file), Markdown = markdown });
                 }
                 Posts = Posts.Where(n => n.Markdown.Meta.Published).OrderByDescending(n => n.Markdown.Meta.Date).ToList();
             }

@@ -17,7 +17,7 @@
         }
     </div>
     <div class="divider text-2xl font-semibold">@Localizer["Featured"]</div>
-    <partial name="_FeaturedPostsPartial" model="Model.Posts.Where(n => n.Markdown.Meta.Featured).OrderByDescending(n => n.Markdown.Meta.Date)" />
+    <partial name="Partials/_FeaturedPostsPartial" model="Model.Posts.Where(n => n.Markdown.Meta.Featured).OrderByDescending(n => n.Markdown.Meta.Date)" />
     <div class="divider text-2xl font-semibold">@Localizer["Posts"]</div>
-    <partial name="_PostsPartial" model="Model.Posts" />
+    <partial name="Partials/_PostsPartial" model="Model.Posts" />
 </div>

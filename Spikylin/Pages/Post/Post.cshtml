@@ -1,5 +1,5 @@
-﻿@page "{fileName}"  
-@model Spikylin.Pages.Blog.PostModel
+﻿@page "/Post/{fileName}"
+@model Spikylin.Pages.Post.PostModel
 @{
 	ViewData["Title"] = Model.Post.Markdown.Meta.Title;
 }
@@ -14,5 +14,3 @@
 	</div>
 	@Html.Raw(@Model.Post.Markdown.Html)
 </article>
-
-

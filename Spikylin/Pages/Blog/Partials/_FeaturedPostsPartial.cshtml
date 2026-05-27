@@ -4,7 +4,7 @@
 <ul class="list">
     @foreach (var doc in Model)
     {
-        <a asp-page="./Post" asp-route-fileName="@doc.FileName">
+        <a asp-page="/Post/Post" asp-route-fileName="@doc.FileName">
             <li class="list-row">
                 <div class="prose">
                     <h4>[@doc.Markdown.Meta.Date.ToString("yyyy-MM-dd")] @doc.Markdown.Meta.Title</h4>

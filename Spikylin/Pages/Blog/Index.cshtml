@@ -4,20 +4,67 @@
 @{
     ViewData["Title"] = "Blog";
 }
-<div class="mx-auto my-3 max-w-4xl">
-    <div class="flex flex-wrap items-start justify-start gap-1">
-        @foreach (var tag in Model.Tags)
-        {
-            <button class="btn btn-sm"
-                    hx-get="Blog?handler=FilterPosts&tag=@tag"
-                    hx-target="#posts"
-                    hx-swap="outerHTML">
-                <span class="surface-4">&num;@Html.DisplayFor(n => tag)</span>
-            </button>
-        }
-    </div>
-    <div class="divider text-2xl font-semibold">@Localizer["Featured"]</div>
-    <partial name="Partials/_FeaturedPostsPartial" model="Model.Posts.Where(n => n.Markdown.Meta.Featured).OrderByDescending(n => n.Markdown.Meta.Date)" />
-    <div class="divider text-2xl font-semibold">@Localizer["Posts"]</div>
-    <partial name="Partials/_PostsPartial" model="Model.Posts" />
-</div>
+<main class="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-6 pb-24">
+    <section class="hero rounded-box bg-base-200">
+        <div class="hero-content w-full justify-between gap-6 px-6 py-10 max-lg:flex-col max-lg:items-start">
+            <div class="max-w-2xl">
+                <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Spikylin Journal</p>
+                <h1 class="mt-3 text-4xl font-bold text-base-content md:text-5xl">@Localizer["Blog"]</h1>
+                <p class="mt-4 max-w-xl text-base leading-7 text-base-content/70 md:text-lg">
+                    Notes on software engineering, AI experiments, and practical ideas designed to stay readable on every screen.
+                </p>
+            </div>
+            <div class="stats w-full max-w-md bg-base-100 shadow-sm max-sm:stats-vertical sm:stats-horizontal">
+                <div class="stat">
+                    <div class="stat-title">@Localizer["Posts"]</div>
+                    <div class="stat-value text-primary">@Model.Posts.Count</div>
+                    <div class="stat-desc">Published articles</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-title">Topics</div>
+                    <div class="stat-value text-secondary">@Model.Tags.Count</div>
+                    <div class="stat-desc">Filter by tag</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="rounded-box border border-base-300 bg-base-100 p-5 shadow-sm">
+        <div class="flex flex-col gap-4">
+            <div>
+                <h2 class="text-lg font-semibold text-base-content">Browse by topic</h2>
+                <p class="text-sm text-base-content/70">Pick a tag to narrow the list without leaving the page.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a asp-page="/Blog/Index" class="btn btn-sm btn-outline">All</a>
+                @foreach (var tag in Model.Tags)
+                {
+                    <button class="btn btn-sm btn-soft"
+                            hx-get="Blog?handler=FilterPosts&tag=@tag"
+                            hx-target="#posts"
+                            hx-swap="outerHTML">
+                        &num;@Html.DisplayFor(n => tag)
+                    </button>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="space-y-4">
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <h2 class="text-2xl font-semibold text-base-content">@Localizer["Featured"]</h2>
+                <p class="text-sm text-base-content/70">A few highlighted posts to start with.</p>
+            </div>
+        </div>
+        <partial name="Partials/_FeaturedPostsPartial" model="Model.Posts.Where(n => n.Markdown.Meta.Featured).OrderByDescending(n => n.Markdown.Meta.Date)" />
+    </section>
+
+    <section class="space-y-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-base-content">@Localizer["Posts"]</h2>
+            <p class="text-sm text-base-content/70">Clean, readable post list with metadata kept in view.</p>
+        </div>
+        <partial name="Partials/_PostsPartial" model="Model.Posts" />
+    </section>
+</main>

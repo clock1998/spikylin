@@ -14,7 +14,8 @@
 - Avoid adding new dependencies unless required.
 
 ## UI and Interactivity Guidelines
-- Use DaisyUI for UI components and styling.
+- Use DaisyUI for UI components and styling, specifically the cupcake theme for the site.
+- Use DaisyUI navbar patterns for clearer navigation visibility in the layout.
 - In Razor Pages, use HTMX for client-side interactivity when interactivity is required.
 
 ## Markdown and Content Handling

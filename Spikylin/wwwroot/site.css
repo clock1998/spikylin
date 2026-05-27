@@ -2,7 +2,7 @@
 @plugin "@tailwindcss/typography";
 @source "../Pages/**/*.{cshtml}";
 @plugin "daisyui" {
-    themes: light --default, dark --prefersdark;
+    themes: cupcake --default;
     root: ":root";
     include:;
     exclude:;

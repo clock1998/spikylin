@@ -36,7 +36,7 @@ namespace Spikylin.Pages.Blog
         {
             LoadPosts();
             var filteredPosts = Posts.Where(n => n.Markdown.Meta.Tags.Contains(tag)).ToList();
-            return Partial("_PostsPartial", filteredPosts);
+            return Partial("Partials/_PostsPartial", filteredPosts);
         }
 
         private void LoadPosts()

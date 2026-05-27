@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>a1aa5383-2fe8-4530-834a-b170619f73e4</UserSecretsId>
@@ -9,12 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Markdig" Version="0.41.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.5" />
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.5" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
-    <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    <PackageReference Include="Markdig" Version="1.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.3.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="10.0.8" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+    <PackageReference Include="YamlDotNet" Version="18.0.0" />
   </ItemGroup>
 
   <ItemGroup>

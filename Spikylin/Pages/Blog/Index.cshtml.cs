@@ -39,12 +39,15 @@ namespace Spikylin.Pages.Blog
             var contentPath = Path.Combine(_env.ContentRootPath, "Posts");
             if (Directory.Exists(contentPath))
             {
-                var searchPattern = cultureShortName.Equals("fr", StringComparison.OrdinalIgnoreCase) ? "*.fr.md" : "*.md";
-                var files = Directory.GetFiles(contentPath, searchPattern, SearchOption.AllDirectories);
+                var files = Directory.GetFiles(contentPath, "*.md", SearchOption.AllDirectories)
+                    .Where(file => cultureShortName.Equals("fr", StringComparison.OrdinalIgnoreCase)
+                        ? file.EndsWith(".fr.md", StringComparison.OrdinalIgnoreCase)
+                        : !file.EndsWith(".fr.md", StringComparison.OrdinalIgnoreCase));
+
                 foreach (var file in files)
                 {
                     var markdownContent = System.IO.File.ReadAllText(file);
-                    var markdown = MarkdigMarkdownParser.Parse(markdownContent);
+                    var markdown = MarkdigMarkdownParser.Parse(markdownContent, file);
                     Posts.Add(new Post { FileName = Path.GetFileNameWithoutExtension(file), Markdown = markdown });
                 }
                 Posts = Posts.Where(n => n.Markdown.Meta.Published).OrderByDescending(n => n.Markdown.Meta.Date).ToList();

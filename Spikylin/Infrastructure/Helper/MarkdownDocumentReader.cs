@@ -27,17 +27,21 @@ namespace Spikylin.Infrastructure.Helper
 
     public class MarkdigMarkdownParser
     {
-        public static Markdown Parse(string markdown)
+        private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder()
+            .UseYamlFrontMatter()
+            .UseAdvancedExtensions()
+            .Build();
+
+        private static readonly IDeserializer Deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .Build();
+
+        public static Markdown Parse(string markdown, string? filePath = null)
         {
-            var pipeline = new MarkdownPipelineBuilder()
-                .UseYamlFrontMatter()       // <-- enable front-matter parsing
-                .UseAdvancedExtensions()
-                .Build();
+            ArgumentNullException.ThrowIfNull(markdown);
 
-            // 1) parse to MarkdownDocument
-            var document = Markdig.Markdown.Parse(markdown, pipeline);
+            var document = Markdig.Markdown.Parse(markdown, Pipeline);
 
-            // 2) extract the first YAML block
             var yamlBlock = document
                 .Descendants<YamlFrontMatterBlock>()
                 .FirstOrDefault();
@@ -45,20 +49,23 @@ namespace Spikylin.Infrastructure.Helper
             var meta = new MarkdownMetadata();
             if (yamlBlock != null)
             {
-                // the content lines of the block
                 var lines = yamlBlock.Lines.Lines
                     .Select(l => l.Slice.ToString());
                 var yaml = string.Join("\n", lines);
-                // 4. Deserialize YAML to your typed object
-                var deserializer = new DeserializerBuilder()
-                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                    .Build();
-                meta = deserializer.Deserialize<MarkdownMetadata>(yaml);
-                meta.Tags ??= new List<string>();
+
+                try
+                {
+                    meta = Deserializer.Deserialize<MarkdownMetadata>(yaml) ?? new MarkdownMetadata();
+                }
+                catch (YamlDotNet.Core.SemanticErrorException)
+                {
+                    meta = new MarkdownMetadata();
+                }
             }
 
-            // 3) render HTML (ignores the front-matter block by default)
-            var html = Markdig.Markdown.ToHtml(markdown, pipeline);
+            meta.Tags ??= new List<string>();
+
+            var html = Markdig.Markdown.ToHtml(markdown, Pipeline);
 
             // Convert fenced mermaid code blocks into <div class="mermaid"> so
             // client-side Mermaid can detect and render them. Markdig renders

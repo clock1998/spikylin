@@ -1,4 +1,4 @@
-﻿using Spikylin.Infrastructure.Helper;
+﻿using Spikylin.Service;
 
 namespace Spikylin.Model
 {

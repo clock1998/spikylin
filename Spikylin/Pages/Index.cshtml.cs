@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Spikylin.Infrastructure.Helper;
+using Spikylin.Service;
 using System.Globalization;
 
 namespace Spikylin.Pages
 {
-    public class IndexModel(IWebHostEnvironment env) : PageModel
+    public class IndexModel(IWebHostEnvironment env, IMarkdownService markdownParser) : PageModel
     {
         public string Html { get; set; } = string.Empty;
         public void OnGet()
@@ -16,7 +16,7 @@ namespace Spikylin.Pages
             if (System.IO.File.Exists(filePath))
             {
                 var markdownContent = System.IO.File.ReadAllText(filePath);
-                Html = MarkdigMarkdownParser.Parse(markdownContent).Html;
+                Html = markdownParser.Parse(markdownContent, filePath).Html;
             }
         }
     }

@@ -1,16 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Spikylin.Infrastructure.Helper;
 using Spikylin.Model;
+using Spikylin.Service;
 
 namespace Spikylin.Pages.Blog
 {
     public class PostModel : PageModel
     {
         private readonly IWebHostEnvironment _env;
-        public PostModel(IWebHostEnvironment env)
+        private readonly IMarkdownService _markdownParser;
+
+        public PostModel(IWebHostEnvironment env, IMarkdownService markdownParser)
         {
             _env = env;
+            _markdownParser = markdownParser;
         }
 
         [BindProperty(SupportsGet = true)]
@@ -23,7 +26,7 @@ namespace Spikylin.Pages.Blog
             if (System.IO.File.Exists(filePath))
             {
                 var markdownContent = System.IO.File.ReadAllText(filePath);
-                var markdown = MarkdigMarkdownParser.Parse(markdownContent);
+                var markdown = _markdownParser.Parse(markdownContent, filePath);
                 Post = new Post
                 {
                     FileName = fileName,

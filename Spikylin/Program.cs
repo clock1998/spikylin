@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
+using Spikylin.Service;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddRazorPages()
     .AddDataAnnotationsLocalization(); // for validation messages;
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddSingleton<IMarkdownService, MarkdigMarkdownService>();
 
 builder.Services.Configure<RequestLocalizationOptions>(opts =>
 {

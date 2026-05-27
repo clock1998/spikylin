@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
-using Spikylin.Infrastructure.Helper;
 using Spikylin.Model;
+using Spikylin.Service;
 using System.Globalization;
 
 namespace Spikylin.Pages.Blog
@@ -12,13 +12,19 @@ namespace Spikylin.Pages.Blog
         private readonly ILogger<IndexModel> _logger;
         private readonly IWebHostEnvironment _env;
         private readonly IStringLocalizer<IndexModel> _localizer;
+        private readonly IMarkdownService _markdownParser;
         public List<Post> Posts { get; set; } = new List<Post>();
         public List<string> Tags => Posts.SelectMany(n => n.Markdown.Meta.Tags).Distinct().ToList();
-        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment env, IStringLocalizer<IndexModel> localizer)
+        public IndexModel(
+            ILogger<IndexModel> logger, 
+            IWebHostEnvironment env, 
+            IStringLocalizer<IndexModel> localizer, 
+            IMarkdownService markdownParser)
         {
             _logger = logger;
             _env = env;
             _localizer = localizer;
+            _markdownParser = markdownParser;
         }
         public void OnGet()
         {
@@ -47,7 +53,7 @@ namespace Spikylin.Pages.Blog
                 foreach (var file in files)
                 {
                     var markdownContent = System.IO.File.ReadAllText(file);
-                    var markdown = MarkdigMarkdownParser.Parse(markdownContent, file);
+                    var markdown = _markdownParser.Parse(markdownContent, file);
                     Posts.Add(new Post { FileName = Path.GetFileNameWithoutExtension(file), Markdown = markdown });
                 }
                 Posts = Posts.Where(n => n.Markdown.Meta.Published).OrderByDescending(n => n.Markdown.Meta.Date).ToList();

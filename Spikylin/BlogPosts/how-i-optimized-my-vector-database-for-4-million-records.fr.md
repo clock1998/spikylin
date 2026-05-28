@@ -1,0 +1,14 @@
+---
+title: 'De 78 Go à 1 Go : comment j''ai optimisé ma base de données vectorielle pour 4 millions d''enregistrements'
+description: Base de données vectorielle
+date: '2026-02-06'
+updated: '2026-02-06'
+tags:
+  - AI
+  - Database
+published: true
+featured: true
+---
+
+La base de données vectorielle est une technologie clé pour développer une solution RAG. Pendant le développement de mon planificateur de budget personnel alimenté par l'IA, j'ai rencontré deux problèmes principaux : une insertion lente et une taille de fichier énorme. Pour le contexte, j'ai mis tous les enregistrements d'entreprises locales dans un fichier CSV. Il contient toutes les informations dont j'ai besoin, comme le nom de l'entreprise, sa description et son domaine d'activité. Afin d'effectuer une recherche sémantique, je dois convertir les noms d'entreprises en embeddings et les enregistrer dans une base de données, qui est PostgreSQL dans mon cas. Au début, j'ai simplement choisi un modèle d'embedding populaire, sentence-transformers/all-mpnet-base-v2 de Hugging Face, pour faire la conversion. Il produisait un vecteur de 700 dimensions, et cela fonctionnait bien avec mon petit jeu de données de test qui ne contenait que 60 enregistrements. Les problèmes sont apparus lorsque j'ai essayé de générer des embeddings pour l'ensemble de mon jeu de données, qui contient 4 millions d'enregistrements. Il fallait 8 heures pour calculer les embeddings et faire l'insertion en base. J'ai essayé plusieurs techniques comme le batching et la commande COPY de PostgreSQL, mais elles n'étaient pas efficaces. J'ai remarqué qu'à chaque fois que je lançais mon script, je devais recalculer l'embedding pour chaque enregistrement, ce qui était un gaspillage de temps et de ressources de calcul. J'ai donc décidé de calculer l'embedding une seule fois et de le sauvegarder dans le fichier CSV afin de ne plus avoir à le recalculer à chaque import. Cependant, un autre problème est apparu. sentence-transformers/all-mpnet-base-v2 produit par défaut un embedding de 758 dimensions. Cela a fait exploser la taille du fichier. Un fichier de 400 Mo est devenu un fichier de 78 Go parce que les embeddings sont stockés en float. J'ai donc dû ajuster le modèle. Je suis passé à jinaai/jina-embeddings-v3 afin de pouvoir utiliser une sortie plus petite. Après être passé à une sortie de 128 dimensions, la taille du fichier a fortement diminué, mais ce n'était toujours pas optimal. J'ai ensuite appliqué une autre technique appelée quantification binaire. Cela convertit les floats en entiers et réduit considérablement la taille. Après tout cela, en ajoutant les embeddings à un fichier de 400 Mo, il est devenu un fichier de 1 Go. J'ai ensuite utilisé la commande COPY fournie par PostgreSQL pour importer le CSV dans ma base de données.
+

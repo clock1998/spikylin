@@ -5,10 +5,16 @@
     Layout = "_Layout";
 }
 <article class="prose container mx-auto max-w-4xl pb-10">
-    <div class="bg-base-200 flex flex-col items-center">
-        <div class="p-4"><img src="~/images/about.jpg" alt="about" class="max-w-48 rounded-lg" /></div>
-        <div class="prose-xl px-14">
+    <div class="hero rounded-box bg-base-200 px-4 py-8 shadow-sm md:px-8">
+        <div class="flex w-full flex-col items-center gap-8">
+            <div class="w-full max-w-3xl overflow-hidden rounded-box bg-base-100 p-3 shadow-xl">
+                <img src="~/images/landing.jpg"
+                     alt="Landing page hero image"
+                     class="h-64 w-full rounded-box object-cover md:h-96" />
+            </div>
+            <div class="prose prose-xl max-w-3xl px-2 md:px-6">
             @Html.Raw(@Model.Html)
+            </div>
         </div>
     </div>
 </article>

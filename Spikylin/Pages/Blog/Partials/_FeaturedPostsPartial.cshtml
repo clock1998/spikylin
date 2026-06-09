@@ -1,20 +1,20 @@
-@using Spikylin.Model
+﻿@using Spikylin.Model
 @model IEnumerable<Post>
 
 @if (Model.Any())
 {
-    <div class="grid gap-4 lg:grid-cols-2">
+    <div class="space-y-3">
         @foreach (var doc in Model)
         {
-            <a asp-page="/Post/Post" asp-route-fileName="@doc.FileName" class="card border border-base-300 bg-base-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                <div class="card-body gap-4">
-                    <div class="flex flex-wrap items-center gap-2 text-sm text-base-content/60">
+            <a asp-page="/Post/Post" asp-route-fileName="@doc.FileName" class="card border-base-300 bg-base-100 border shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <div class="card-body gap-3 p-4">
+                    <div class="text-base-content/60 flex flex-wrap items-center gap-2 text-sm">
                         <span class="badge badge-outline">Featured</span>
                         <span>@doc.Markdown.Meta.Date.ToString("yyyy-MM-dd")</span>
                     </div>
                     <div class="space-y-2">
-                        <h3 class="text-xl font-semibold text-base-content">@doc.Markdown.Meta.Title</h3>
-                        <p class="line-clamp-3 text-sm leading-6 text-base-content/75">@doc.Markdown.Meta.Description</p>
+                        <h3 class="text-base-content text-base font-semibold break-words">@doc.Markdown.Meta.Title</h3>
+                        <p class="text-base-content/75 line-clamp-3 text-sm leading-6">@doc.Markdown.Meta.Description</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         @foreach (var tag in doc.Markdown.Meta.Tags)
@@ -29,7 +29,7 @@
 }
 else
 {
-    <div class="rounded-box border border-dashed border-base-300 bg-base-100 p-6 text-sm text-base-content/70">
+    <div class="rounded-box border-base-300 bg-base-100 text-base-content/70 border border-dashed p-6 text-sm">
         No featured posts yet.
     </div>
 }

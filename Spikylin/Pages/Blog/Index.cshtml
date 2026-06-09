@@ -24,7 +24,7 @@
                     <div class="stat-title">Topics</div>
                     <div class="stat-value text-secondary">@Model.Tags.Count</div>
                     <div class="stat-desc">Filter by tag</div>
-                </div>
+                </div> 
             </div>
         </div>
     </section>
@@ -50,21 +50,19 @@
         </div>
     </section>
 
-    <section class="space-y-4">
-        <div class="flex items-center justify-between gap-4">
-            <div>
-                <h2 class="text-base-content text-2xl font-semibold">@Localizer["Featured"]</h2>
-                <p class="text-base-content/70 text-sm">A few highlighted posts to start with.</p>
-            </div>
+    <section class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div class="order-2 space-y-4 lg:order-1">
+            <partial name="Partials/_PostsPartial" model="Model.Posts" />
         </div>
-        <partial name="Partials/_FeaturedPostsPartial" model="Model.Posts.Where(n => n.Markdown.Meta.Featured).OrderByDescending(n => n.Markdown.Meta.Date)" />
-    </section>
 
-    <section class="space-y-4">
-        <div>
-            <h2 class="text-base-content text-2xl font-semibold">@Localizer["Posts"]</h2>
-            <p class="text-base-content/70 text-sm">Clean, readable post list with metadata kept in view.</p>
-        </div>
-        <partial name="Partials/_PostsPartial" model="Model.Posts" />
+        <aside class="order-1 lg:sticky lg:top-24 lg:order-2">
+            <div class="rounded-box border-base-300 bg-base-100 space-y-4 border p-4 shadow-sm">
+                <div>
+                    <h2 class="text-base-content text-xl font-semibold">@Localizer["Featured"]</h2>
+                    <p class="text-base-content/70 text-sm">A few highlighted posts to start with.</p>
+                </div>
+                <partial name="Partials/_FeaturedPostsPartial" model="Model.Posts.Where(n => n.Markdown.Meta.Featured).OrderByDescending(n => n.Markdown.Meta.Date)" />
+            </div>
+        </aside>
     </section>
 </main>

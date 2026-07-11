@@ -113,7 +113,7 @@ jobs:
       - name: Deploy via SSH Loopback
         uses: appleboy/ssh-action@v1.2.4
         with:
-          host: 10.10.10.3
+          host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
@@ -124,12 +124,12 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./Spikylin/docker-compose.yml ${{ secrets.SERVER_USER }}@10.10.10.3:$HOME/spikylin/docker-compose.yml
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./Spikylin/docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:$HOME/spikylin/docker-compose.yml
 
       - name: Deploy via SSH Loopback
         uses: appleboy/ssh-action@v1.2.4
         with:
-          host: 10.10.10.3
+          host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |

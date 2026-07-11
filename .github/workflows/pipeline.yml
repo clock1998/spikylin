@@ -116,6 +116,9 @@ jobs:
           host: 10.10.10.3
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p $HOME/spikylin
+            
       - name: Copy docker-compose.yml to remote server
         run: |
           mkdir -p ~/.ssh

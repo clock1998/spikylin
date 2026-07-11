@@ -129,7 +129,7 @@ jobs:
       - name: Deploy via SSH Loopback
         uses: appleboy/ssh-action@v1.2.4
         with:
-          host: 192.168.1.4
+          host: 10.10.10.3
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |

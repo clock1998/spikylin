@@ -37,6 +37,9 @@
     <None Update="BlogPosts\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+	<None Update="wwwroot\**\*">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
 
   <Target Name="TailwindDevelopment" BeforeTargets="Compile" Condition="'$(Configuration)' != 'Release'">

@@ -18,7 +18,7 @@ My garage is a mess, so I need a shelf to store some of the tools and other stuf
 The shelf is 1.824 m wide, 0.6m deep, and 2m tall. The heigh for each level is 0.576m. The shelf is made of 2x4s and plywood.
 The design is optimized for material usage and cost. The total cost is around 70 CAD at the time of writing. All you need is 14 peices of 2x4x8', 2 peices of 4x8' plywood, and some screws.
 
-![Garage Shelf](/images/post_images/garage-shelf/garage-shelf.png)
+![Garage Shelf](https://s3.spikylin.com/public/blog-images/homelab/garage-shelf/garage-shelf.png)
 
 ## Build
 

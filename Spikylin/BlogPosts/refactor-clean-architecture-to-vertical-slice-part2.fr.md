@@ -19,7 +19,7 @@ J'ai décidé de changer l'architecture de Clean Architecture vers CQRS. Il y a 
 4. Réduire les conflits de fusion.
 
 Dans mon ancienne clean architecture, toute la logique métier résidait dans le fichier AuthRepository.cs. Maintenant, cette logique est séparée dans différentes commandes :
-![alt text](/images/post_images/refactor-clean-architecture-to-vertical-slice/CQRS-file-structure.png)
+![alt text](https://s3.spikylin.com/public/blog-images/homelab/refactor-clean-architecture-to-vertical-slice/CQRS-file-structure.png)
 Cependant, je n'ai pas placé les méthodes de contrôleur dans les handlers, car j'utilise encore des méthodes de contrôleur traditionnelles. Je trouve qu'il est préférable de regrouper tous les endpoints dans une même classe afin de bénéficier des fonctionnalités de groupement et de nommage du framework. Un inconvénient est que si j'ai beaucoup plus d'endpoints pour une seule fonctionnalité, la classe du contrôleur deviendra très volumineuse. Une solution potentielle serait d'utiliser des classes partielles. Une autre option est Minimal API, et c'est probablement un meilleur choix si vous voulez placer les endpoints dans les mêmes fichiers que les handlers.
 
 J'ai aussi ajouté Fluent Validator. Cela rend la validation plus propre. Je l'utilise principalement pour valider les modèles de données, pas la logique métier.

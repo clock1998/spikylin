@@ -11,7 +11,7 @@ featured: true
 
 This re-ramped homelab runs on a single all-in-one Unraid server with separate networks for trusted LAN access and self-hosted application workloads.
 
-<img src="/images/post_images/my-home-lab-4/1.jpg" alt="Dell Precision Rack" width="400"/>
+<img src="https://s3.spikylin.com/public/blog-images/homelab/my-home-lab-4/1.jpg" alt="Dell Precision Rack" width="400"/>
 
 ## Core Platform
 

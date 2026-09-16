@@ -18,7 +18,7 @@ Mon garage est en désordre, donc j'ai besoin d'une étagère pour ranger certai
 L'étagère mesure 1,824 m de large, 0,6 m de profondeur et 2 m de hauteur. La hauteur de chaque niveau est de 0,576 m. L'étagère est fabriquée avec des 2x4 et du contreplaqué.
 La conception est optimisée pour l'utilisation des matériaux et le coût. Le coût total est d'environ 70 CAD au moment de l'écriture. Il vous faut 14 pièces de 2x4x8', 2 pièces de contreplaqué 4x8' et quelques vis.
 
-![Garage Shelf](/images/post_images/garage-shelf/garage-shelf.png)
+![Garage Shelf](https://s3.spikylin.com/public/blog-images/homelab/garage-shelf/garage-shelf.png)
 
 ## Construction
 

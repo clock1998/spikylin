@@ -17,15 +17,15 @@ Un bridge fonctionne comme un switch. Il y a plusieurs ports sur un routeur et, 
 
 1. Si le routeur reçoit l'adresse IP publique via DHCP, allez dans le client DHCP et décochez `Use DNS Peer`. Désactivez le réseau puis réactivez l'interface du client DHCP pour que le changement soit pris en compte.
 
-<img src="/images/post_images/routeros-learning-note/dhcp-client.png" alt="DNS1" width="400"/>
+<img src="https://s3.spikylin.com/public/blog-images/homelab/routeros-learning-note/dhcp-client.png" alt="DNS1" width="400"/>
 
 2. Configurez un DNS personnalisé et cochez `allow remote request` (pour permettre au routeur d'accepter et de transférer les requêtes DNS). J'ai un serveur DNS qui tourne sur 192.168.1.3
 
-<img src="/images/post_images/routeros-learning-note/dns.png" alt="" width="400"/>
+<img src="https://s3.spikylin.com/public/blog-images/homelab/routeros-learning-note/dns.png" alt="" width="400"/>
 
 3. Configurez le DNS personnalisé dans le serveur DHCP. Le DNS doit être l'adresse du routeur. Dans ce cas, tous les appareils recevront 192.168.1.1 comme serveur DNS.
 
-<img src="/images/post_images/routeros-learning-note/dhcp-dns.png" alt="" width="400"/>
+<img src="https://s3.spikylin.com/public/blog-images/homelab/routeros-learning-note/dhcp-dns.png" alt="" width="400"/>
 
 4. Libérez puis renouvelez l'adresse IP sur les appareils.
 
@@ -34,10 +34,10 @@ Un bridge fonctionne comme un switch. Il y a plusieurs ports sur un routeur et, 
 1. Configurez l'interface WireGuard.
 2. Configurez l'adresse IP pour l'interface WireGuard.
 3. Ajoutez des peers WireGuard. L'adresse autorisée (`Allowed Address`) doit être un sous-réseau de l'adresse WireGuard. Par exemple, si WireGuard a l'adresse 10.0.0.1/24, l'adresse autorisée du peer doit être 10.1.1.2/32
-<img src="/images/post_images/routeros-learning-note/wireguard1.png" alt="" width="400"/>
+<img src="https://s3.spikylin.com/public/blog-images/homelab/routeros-learning-note/wireguard1.png" alt="" width="400"/>
 
 4. Utilisez un client WireGuard pour générer une clé publique et collez-la dans le peer WireGuard.
-<img src="/images/post_images/routeros-learning-note/wireguard1.png" alt="" width="400"/>
+<img src="https://s3.spikylin.com/public/blog-images/homelab/routeros-learning-note/wireguard1.png" alt="" width="400"/>
 
 5. Renseignez les informations du tunnel WireGuard :
 

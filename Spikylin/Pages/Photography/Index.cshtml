@@ -1,0 +1,88 @@
+@page
+@model Spikylin.Pages.Photography.IndexModel
+@{
+    ViewData["Title"] = "Photography";
+}
+
+<main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <header class="mb-8">
+        <h1 class="text-4xl font-bold tracking-tight">Photography</h1>
+        <p class="mt-2 text-base-content/70">A collection of moments.</p>
+    </header>
+
+    @if (Model.LoadError is not null)
+    {
+        <div role="alert" class="alert alert-error">
+            <span>@Model.LoadError</span>
+        </div>
+    }
+    else if (Model.Photos.Count == 0)
+    {
+        <p class="text-base-content/70">No photographs are available yet.</p>
+    }
+    else
+    {
+        <section aria-label="Photography gallery" class="columns-1 gap-4 sm:columns-2 lg:columns-3">
+            @foreach (var photo in Model.Photos)
+            {
+                <button type="button"
+                        class="group mb-4 block w-full break-inside-avoid overflow-hidden rounded-box bg-base-200 text-left shadow-sm transition hover:shadow-xl focus:outline-2 focus:outline-offset-2 focus:outline-primary"
+                        data-photo-url="@photo.Url"
+                        data-photo-title="@photo.Key"
+                        aria-label="View @photo.Key">
+                    <img src="@photo.Url"
+                         alt="@photo.Key"
+                         loading="lazy"
+                         class="block h-auto max-h-[75vh] w-full object-cover transition duration-300 group-hover:scale-105" />
+                    <span class="block truncate px-4 py-3 text-sm text-base-content/70">@photo.Date.ToLocalTime().ToString("d")</span>
+                </button>
+            }
+        </section>
+    }
+</main>
+
+<dialog id="photo-modal" class="m-0 h-screen max-h-none w-screen max-w-none bg-black/95 p-0 text-white backdrop:bg-black/80">
+    <div class="relative flex h-full w-full items-center justify-center p-4 sm:p-8">
+        <button id="photo-modal-close" type="button" class="btn btn-circle btn-ghost absolute right-4 top-4 z-10 text-2xl text-white" aria-label="Close photo viewer">&times;</button>
+        <figure class="flex max-h-full max-w-full flex-col items-center gap-3">
+            <img id="photo-modal-image" src="" alt="" class="max-h-[calc(100vh-6rem)] max-w-full object-contain" />
+            <figcaption id="photo-modal-caption" class="max-w-full truncate text-sm text-white/80"></figcaption>
+        </figure>
+    </div>
+</dialog>
+
+<script>
+    (() => {
+        const modal = document.getElementById('photo-modal');
+        const image = document.getElementById('photo-modal-image');
+        const caption = document.getElementById('photo-modal-caption');
+        const closeButton = document.getElementById('photo-modal-close');
+
+        if (!modal || !image || !caption || !closeButton) {
+            return;
+        }
+
+        const closeModal = () => modal.close();
+
+        document.querySelectorAll('[data-photo-url]').forEach((tile) => {
+            tile.addEventListener('click', () => {
+                image.src = tile.dataset.photoUrl;
+                image.alt = tile.dataset.photoTitle;
+                caption.textContent = tile.dataset.photoTitle;
+                modal.showModal();
+            });
+        });
+
+        closeButton.addEventListener('click', closeModal);
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+        modal.addEventListener('close', () => {
+            image.src = '';
+            image.alt = '';
+            caption.textContent = '';
+        });
+    })();
+</script>

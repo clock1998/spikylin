@@ -1,6 +1,4 @@
-﻿using Spikylin.Service;
-
-namespace Spikylin.Model
+﻿namespace Spikylin.Model
 {
     public class Post
     {

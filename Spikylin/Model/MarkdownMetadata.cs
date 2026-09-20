@@ -1,4 +1,4 @@
-namespace Spikylin.Service;
+namespace Spikylin.Model;
 
 public class MarkdownMetadata
 {

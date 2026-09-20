@@ -1,3 +1,5 @@
+using Spikylin.Model;
+
 namespace Spikylin.Service;
 
 public interface IMarkdownService

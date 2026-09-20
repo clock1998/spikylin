@@ -1,13 +1,13 @@
 using Amazon.S3;
 using Amazon.S3.Model;
-using System.Globalization;
+using MetadataExtractor;
+using MetadataExtractor.Formats.Exif;
 
 namespace Spikylin.Service;
 
 public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configuration, ILogger<S3PhotoCatalog> logger)
 {
     private static readonly string[] ImageExtensions = [".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp"];
-    private static readonly string[] DefaultDateHeaders = ["x-amz-meta-photo-date", "x-amz-meta-date", "x-amz-meta-taken-at"];
     private readonly S3PhotoOptions options = configuration.GetSection("Photography:S3").Get<S3PhotoOptions>() ?? new();
 
     /// <summary>Loads the public image objects and orders them by their photo date.</summary>
@@ -34,8 +34,8 @@ public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configurat
         var photos = new List<PhotoItem>(objects.Count);
         foreach (var item in objects.Where(IsImage))
         {
-            var photoDate = await GetPhotoDateAsync(item, cancellationToken).ConfigureAwait(false);
-            photos.Add(new PhotoItem(item.Key, BuildObjectUri(item.Key), photoDate));
+            var metadata = await GetPhotoMetadataAsync(item, cancellationToken).ConfigureAwait(false);
+            photos.Add(new PhotoItem(item.Key, BuildObjectUri(item.Key), metadata.Date, metadata.Details));
         }
 
         return photos
@@ -44,44 +44,57 @@ public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configurat
             .ToArray();
     }
 
-    private async Task<DateTimeOffset> GetPhotoDateAsync(S3Object item, CancellationToken cancellationToken)
+    private async Task<PhotoMetadataResult> GetPhotoMetadataAsync(S3Object item, CancellationToken cancellationToken)
     {
         try
         {
-            var response = await s3Client.GetObjectMetadataAsync(new GetObjectMetadataRequest
+            using var response = await s3Client.GetObjectAsync(new GetObjectRequest
             {
                 BucketName = options.BucketName,
                 Key = item.Key,
             }, cancellationToken).ConfigureAwait(false);
 
-            foreach (var headerName in options.DateHeaders ?? DefaultDateHeaders)
-            {
-                var metadataKey = headerName.StartsWith("x-amz-meta-", StringComparison.OrdinalIgnoreCase)
-                    ? headerName["x-amz-meta-".Length..]
-                    : headerName;
+            using var seekableStream = new MemoryStream();
+            await response.ResponseStream.CopyToAsync(seekableStream, cancellationToken).ConfigureAwait(false);
+            seekableStream.Position = 0;
 
-                var metadataKeyInResponse = response.Metadata.Keys.FirstOrDefault(key =>
-                    string.Equals(key, headerName, StringComparison.OrdinalIgnoreCase)
-                    || string.Equals(key, metadataKey, StringComparison.OrdinalIgnoreCase));
+            var directories = ImageMetadataReader.ReadMetadata(seekableStream);
 
-                if (metadataKeyInResponse is not null
-                    && TryParseDate(response.Metadata[metadataKeyInResponse], out var date))
-                {
-                    return date;
-                }
-            }
+            return new PhotoMetadataResult(
+                item.LastModified,
+                new PhotoMetadata(
+                    GetExifValue<ExifIfd0Directory>(directories, ExifDirectoryBase.TagModel),
+                    GetExifValue<ExifSubIfdDirectory>(directories, ExifDirectoryBase.TagDateTimeOriginal),
+                    GetExifValue(directories, ExifDirectoryBase.TagFocalLength),
+                    GetExifValue(directories, ExifDirectoryBase.TagFNumber),
+                    GetExifValue(directories, ExifDirectoryBase.TagIsoEquivalent),
+                    GetExifValue(directories, ExifDirectoryBase.TagExposureTime)));
         }
         catch (HttpRequestException exception)
         {
             logger.LogWarning(exception, "Could not read metadata for photography object {ObjectKey}", item.Key);
         }
+        catch (ImageProcessingException exception)
+        {
+            logger.LogWarning(exception, "Could not read EXIF data for photography object {ObjectKey}", item.Key);
+        }
+        catch (AmazonS3Exception exception)
+        {
+            logger.LogWarning(exception, "Could not download photography object {ObjectKey} for EXIF data", item.Key);
+        }
 
-        return item.LastModified;
+        return new PhotoMetadataResult(item.LastModified, new PhotoMetadata(null, null, null, null, null, null));
     }
 
-    private static bool TryParseDate(string value, out DateTimeOffset date)
+    private static string? GetExifValue(IReadOnlyList<MetadataExtractor.Directory> directories, int tag) =>
+        GetExifValue<ExifSubIfdDirectory>(directories, tag);
+
+    private static string? GetExifValue<TDirectory>(IReadOnlyList<MetadataExtractor.Directory> directories, int tag)
+        where TDirectory : MetadataExtractor.Directory
     {
-        return DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out date);
+        return directories.OfType<TDirectory>()
+            .Select(directory => directory.GetDescription(tag))
+            .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
     }
 
     private Uri BuildObjectUri(string key)
@@ -94,6 +107,7 @@ public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configurat
     private static bool IsImage(S3Object item) => ImageExtensions.Contains(Path.GetExtension(item.Key), StringComparer.OrdinalIgnoreCase);
 
     private sealed record S3Object(string Key, DateTimeOffset LastModified);
+    private sealed record PhotoMetadataResult(DateTimeOffset Date, PhotoMetadata Details);
 }
 
 public sealed class S3PhotoOptions
@@ -101,7 +115,27 @@ public sealed class S3PhotoOptions
     public string Endpoint { get; set; } = "https://s3.spikylin.com/public";
     public string BucketName { get; set; } = "public";
     public string Prefix { get; set; } = "photography/";
-    public string[] DateHeaders { get; set; } = ["x-amz-meta-photo-date", "x-amz-meta-date", "x-amz-meta-taken-at"];
 }
 
-public sealed record PhotoItem(string Key, Uri Url, DateTimeOffset Date);
+public sealed record PhotoMetadata(
+    string? CameraModel,
+    string? DateTime,
+    string? FocalLength,
+    string? Aperture,
+    string? Iso,
+    string? ShutterSpeed)
+{
+    public string DisplayText => string.Join(" · ",
+        new[]
+        {
+            CameraModel,
+            DateTime,
+            FocalLength,
+            Aperture,
+            Iso is null ? null : $"ISO {Iso}",
+            ShutterSpeed,
+        }.Where(value => !string.IsNullOrWhiteSpace(value)));
+}
+
+public sealed record PhotoItem(string Key, Uri Url, DateTimeOffset Date, PhotoMetadata Metadata);
+

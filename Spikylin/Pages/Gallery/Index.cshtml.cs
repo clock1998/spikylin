@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spikylin.Service;
 
-namespace Spikylin.Pages.Photography;
+namespace Spikylin.Pages.Gallery;
 
 public class IndexModel(S3PhotoCatalog photoCatalog, ILogger<IndexModel> logger) : PageModel
 {

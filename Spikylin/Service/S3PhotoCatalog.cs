@@ -8,7 +8,7 @@ namespace Spikylin.Service;
 public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configuration, ILogger<S3PhotoCatalog> logger)
 {
     private static readonly string[] ImageExtensions = [".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp"];
-    private readonly S3PhotoOptions options = configuration.GetSection("Photography:S3").Get<S3PhotoOptions>() ?? new();
+    private readonly S3PhotoOptions options = configuration.GetSection("S3").Get<S3PhotoOptions>() ?? new();
 
     /// <summary>Loads the public image objects and orders them by their photo date.</summary>
     public async Task<IReadOnlyList<PhotoItem>> GetPhotosAsync(CancellationToken cancellationToken = default)
@@ -112,7 +112,7 @@ public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configurat
 
 public sealed class S3PhotoOptions
 {
-    public string Endpoint { get; set; } = "https://s3.spikylin.com/public";
+    public string Endpoint { get; set; } = "https://s3.spikylin.com";
     public string BucketName { get; set; } = "public";
     public string Prefix { get; set; } = "photography/";
 }

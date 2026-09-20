@@ -18,7 +18,7 @@ builder.Services.AddSingleton<IMarkdownService, MarkdigMarkdownService>();
 builder.Services.AddSingleton<IAmazonS3>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
-    var options = configuration.GetSection("Photography:S3").Get<S3PhotoOptions>() ?? new();
+    var options = configuration.GetSection("S3").Get<S3PhotoOptions>() ?? new();
     var endpoint = new Uri(options.Endpoint);
     var clientConfig = new AmazonS3Config
     {
@@ -30,6 +30,7 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
     return new AmazonS3Client(new AnonymousAWSCredentials(), clientConfig);
 });
 builder.Services.AddTransient<S3PhotoCatalog>();
+builder.Services.AddTransient<IThumbnailService, ImageSharpThumbnailService>();
 
 builder.Services.Configure<RequestLocalizationOptions>(opts =>
 {

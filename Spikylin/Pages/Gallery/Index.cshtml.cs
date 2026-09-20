@@ -1,9 +1,13 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spikylin.Service;
 
 namespace Spikylin.Pages.Gallery;
 
-public class IndexModel(S3PhotoCatalog photoCatalog, ILogger<IndexModel> logger) : PageModel
+public class IndexModel(
+    S3PhotoCatalog photoCatalog,
+    IThumbnailService thumbnailService,
+    ILogger<IndexModel> logger) : PageModel
 {
     public IReadOnlyList<PhotoItem> Photos { get; private set; } = [];
 
@@ -20,6 +24,18 @@ public class IndexModel(S3PhotoCatalog photoCatalog, ILogger<IndexModel> logger)
             logger.LogError(exception, "Unable to load photography from the S3 endpoint.");
             LoadError = "Photography is temporarily unavailable.";
         }
+    }
 
+    public async Task<IActionResult> OnGetThumbnailAsync(
+        string key,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            return BadRequest();
+        }
+
+        var thumbnail = await thumbnailService.CreateAsync(key, cancellationToken);
+        return File(thumbnail.Content, thumbnail.ContentType);
     }
 }

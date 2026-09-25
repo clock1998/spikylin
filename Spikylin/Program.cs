@@ -1,5 +1,3 @@
-using Amazon.Runtime;
-using Amazon.S3;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using Spikylin.Service;
@@ -15,22 +13,16 @@ builder.Services.AddRazorPages()
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddSingleton<IMarkdownService, MarkdigMarkdownService>();
-builder.Services.AddSingleton<IAmazonS3>(sp =>
+builder.Services.AddSingleton<S3Clients>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
     var options = configuration.GetSection("S3").Get<S3PhotoOptions>() ?? new();
-    var endpoint = new Uri(options.Endpoint);
-    var clientConfig = new AmazonS3Config
-    {
-        ServiceURL = $"{endpoint.Scheme}://{endpoint.Authority}",
-        ForcePathStyle = true,
-        Timeout = TimeSpan.FromSeconds(30),
-    };
-
-    return new AmazonS3Client(new AnonymousAWSCredentials(), clientConfig);
+    return new S3Clients(options);
 });
 builder.Services.AddTransient<S3PhotoCatalog>();
-builder.Services.AddTransient<IThumbnailService, ImageSharpThumbnailService>();
+builder.Services.AddSingleton<IThumbnailService, ImageSharpThumbnailService>();
+builder.Services.AddSingleton<S3ThumbnailSynchronizationService>();
+builder.Services.AddHostedService<S3ThumbnailSynchronizationWorker>();
 
 builder.Services.Configure<RequestLocalizationOptions>(opts =>
 {

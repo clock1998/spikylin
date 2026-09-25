@@ -17,7 +17,13 @@ public class IndexModel(
     {
         try
         {
-            Photos = await photoCatalog.GetPhotosAsync(cancellationToken);
+            var photos = await photoCatalog.GetPhotosAsync(cancellationToken);
+            Photos = photos
+                .Select(photo => photo with
+                {
+                    ThumbnailUrl = Url.Page("/Gallery/Index", "Thumbnail", new { key = photo.Key }),
+                })
+                .ToArray();
         }
         catch (HttpRequestException exception)
         {
@@ -35,7 +41,7 @@ public class IndexModel(
             return BadRequest();
         }
 
-        var thumbnail = await thumbnailService.CreateAsync(key, cancellationToken);
+        var thumbnail = await thumbnailService.GetAsync(key, cancellationToken);
         return File(thumbnail.Content, thumbnail.ContentType);
     }
 }

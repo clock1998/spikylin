@@ -31,7 +31,7 @@
                         data-photo-title="@photo.Key"
                         data-photo-metadata="@photo.Metadata.DisplayText"
                         aria-label="View @photo.Key">
-                    <img src="@Url.Page("/Gallery/Index", "Thumbnail", new { key = photo.Key })"
+                    <img src="@photo.ThumbnailUrl"
                          alt="@photo.Key"
                          loading="lazy"
                          class="absolute inset-0 block h-full w-full object-cover" />

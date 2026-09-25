@@ -5,7 +5,7 @@ using MetadataExtractor.Formats.Exif;
 
 namespace Spikylin.Service;
 
-public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configuration, ILogger<S3PhotoCatalog> logger)
+public sealed class S3PhotoCatalog(S3Clients s3Clients, IConfiguration configuration, ILogger<S3PhotoCatalog> logger)
 {
     private static readonly string[] ImageExtensions = [".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp"];
     private readonly S3PhotoOptions options = configuration.GetSection("S3").Get<S3PhotoOptions>() ?? new();
@@ -18,15 +18,15 @@ public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configurat
 
         do
         {
-            var response = await s3Client.ListObjectsV2Async(new ListObjectsV2Request
+            var response = await s3Clients.Public.ListObjectsV2Async(new ListObjectsV2Request
             {
-                BucketName = options.BucketName,
+                BucketName = options.PublicBucket.BucketName,
                 ContinuationToken = continuationToken,
                 MaxKeys = 1_000,
-                Prefix = options.Prefix,
+                Prefix = options.PublicBucket.Prefix,
             }, cancellationToken).ConfigureAwait(false);
 
-            objects.AddRange(response.S3Objects.Select(item => new S3Object(item.Key, item.LastModified ?? DateTime.UtcNow)));
+            objects.AddRange((response.S3Objects ?? []).Select(item => new S3Object(item.Key, item.LastModified ?? DateTime.UtcNow)));
             continuationToken = response.IsTruncated == true ? response.NextContinuationToken : null;
         }
         while (!string.IsNullOrWhiteSpace(continuationToken));
@@ -48,9 +48,9 @@ public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configurat
     {
         try
         {
-            using var response = await s3Client.GetObjectAsync(new GetObjectRequest
+            using var response = await s3Clients.Public.GetObjectAsync(new GetObjectRequest
             {
-                BucketName = options.BucketName,
+                BucketName = options.PublicBucket.BucketName,
                 Key = item.Key,
             }, cancellationToken).ConfigureAwait(false);
 
@@ -101,7 +101,7 @@ public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configurat
     {
         var endpoint = options.Endpoint.TrimEnd('/');
         var escapedKey = string.Join('/', key.Split('/').Select(Uri.EscapeDataString));
-        return new Uri($"{endpoint}/{options.BucketName}/{escapedKey}", UriKind.Absolute);
+        return new Uri($"{endpoint}/{options.PublicBucket.BucketName}/{escapedKey}", UriKind.Absolute);
     }
 
     private static bool IsImage(S3Object item) => ImageExtensions.Contains(Path.GetExtension(item.Key), StringComparer.OrdinalIgnoreCase);
@@ -113,8 +113,24 @@ public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configurat
 public sealed class S3PhotoOptions
 {
     public string Endpoint { get; set; } = "https://s3.spikylin.com";
-    public string BucketName { get; set; } = "public";
-    public string Prefix { get; set; } = "photography/";
+    public List<S3BucketOptions> Buckets { get; set; } = [];
+
+    public S3BucketOptions PublicBucket =>
+        Buckets.FirstOrDefault(bucket => string.Equals(bucket.BucketName, "public", StringComparison.OrdinalIgnoreCase))
+        ?? new S3BucketOptions { BucketName = "public", Prefix = "photography/" };
+
+    public S3BucketOptions ThumbnailBucket =>
+        Buckets.FirstOrDefault(bucket => string.Equals(bucket.BucketName, "gallery-thumbnail", StringComparison.OrdinalIgnoreCase))
+        ?? new S3BucketOptions { BucketName = "gallery-thumbnail", ThumbnailSyncIntervalSeconds = 300 };
+}
+
+public sealed class S3BucketOptions
+{
+    public string BucketName { get; set; } = string.Empty;
+    public string Prefix { get; set; } = string.Empty;
+    public string AccessId { get; set; } = string.Empty;
+    public string AccessSecret { get; set; } = string.Empty;
+    public int ThumbnailSyncIntervalSeconds { get; set; } = 300;
 }
 
 public sealed record PhotoMetadata(
@@ -137,5 +153,8 @@ public sealed record PhotoMetadata(
         }.Where(value => !string.IsNullOrWhiteSpace(value)));
 }
 
-public sealed record PhotoItem(string Key, Uri Url, DateTimeOffset Date, PhotoMetadata Metadata);
+public sealed record PhotoItem(string Key, Uri Url, DateTimeOffset Date, PhotoMetadata Metadata)
+{
+    public string? ThumbnailUrl { get; init; }
+}
 

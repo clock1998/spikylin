@@ -19,8 +19,10 @@ builder.Services.AddSingleton<S3Clients>(sp =>
     var options = configuration.GetSection("S3").Get<S3PhotoOptions>() ?? new();
     return new S3Clients(options);
 });
-builder.Services.AddTransient<S3PhotoCatalog>();
-builder.Services.AddSingleton<IThumbnailService, ImageSharpThumbnailService>();
+builder.Services.AddTransient<S3GalleryService>();
+builder.Services.AddSingleton<IThumbnailService, ThumbnailService>();
+builder.Services.AddSingleton<IImageSharpService, ImageSharpService>();
+
 builder.Services.AddSingleton<S3ThumbnailSynchronizationService>();
 builder.Services.AddHostedService<S3ThumbnailSynchronizationWorker>();
 

@@ -13,21 +13,18 @@ public sealed class S3Clients : IDisposable
             ServiceURL = $"{endpoint.Scheme}://{endpoint.Authority}",
             ForcePathStyle = true,
             Timeout = TimeSpan.FromSeconds(30),
+            AuthenticationRegion = "garage"
         };
-
-        Public = new AmazonS3Client(new AnonymousAWSCredentials(), clientConfig);
-        Thumbnails = new AmazonS3Client(
-            new BasicAWSCredentials(options.ThumbnailBucket.AccessId, options.ThumbnailBucket.AccessSecret),
-            clientConfig);
+        SpikylinS3 = new AmazonS3Client(
+            new BasicAWSCredentials(
+                options.SpikylinS3Bucket.AccessId, 
+                options.SpikylinS3Bucket.AccessSecret), clientConfig);
     }
 
-    public IAmazonS3 Public { get; }
-
-    public IAmazonS3 Thumbnails { get; }
+    public IAmazonS3 SpikylinS3 { get; }
 
     public void Dispose()
     {
-        Public.Dispose();
-        Thumbnails.Dispose();
+        SpikylinS3.Dispose();
     }
 }

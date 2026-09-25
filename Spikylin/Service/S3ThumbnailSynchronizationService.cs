@@ -1,11 +1,12 @@
 using Amazon.S3;
 using Amazon.S3.Model;
+using Spikylin.Core;
 
 namespace Spikylin.Service;
 
 public sealed class S3ThumbnailSynchronizationService(
     S3Clients s3Clients,
-    IThumbnailService thumbnailService,
+    IImageSharpService imageSharpService,
     IConfiguration configuration,
     ILogger<S3ThumbnailSynchronizationService> logger)
 {
@@ -14,17 +15,17 @@ public sealed class S3ThumbnailSynchronizationService(
 
     public async Task SynchronizeAsync(CancellationToken cancellationToken)
     {
-        var originals = await ListObjectsAsync(s3Clients.Public, options.PublicBucket.BucketName, options.PublicBucket.Prefix, cancellationToken).ConfigureAwait(false);
-        var thumbnails = await ListObjectsAsync(s3Clients.Thumbnails, options.ThumbnailBucket.BucketName, string.Empty, cancellationToken).ConfigureAwait(false);
+        var originals = await ListObjectsAsync(s3Clients.SpikylinS3, options.SpikylinS3Bucket.BucketName, "gallery/", cancellationToken).ConfigureAwait(false);
+        var thumbnails = await ListObjectsAsync(s3Clients.SpikylinS3, options.SpikylinS3Bucket.BucketName, "gallery-thumbnail/", cancellationToken).ConfigureAwait(false);
         var originalKeys = originals
             .Where(item => IsImage(item.Key))
-            .Select(item => GetThumbnailKey(item.Key))
+            .Select(item => Helper.BuildThumbnailKey(options.SpikylinS3Bucket.Prefix, item.Key))
             .ToHashSet(StringComparer.Ordinal);
         var thumbnailsByKey = thumbnails.ToDictionary(item => item.Key, StringComparer.Ordinal);
 
         foreach (var original in originals.Where(item => IsImage(item.Key)))
         {
-            var thumbnailKey = GetThumbnailKey(original.Key);
+            var thumbnailKey = Helper.BuildThumbnailKey(options.SpikylinS3Bucket.Prefix, original.Key);
             if (!thumbnailsByKey.TryGetValue(thumbnailKey, out var thumbnail)
                 || original.LastModified > thumbnail.LastModified)
             {
@@ -34,9 +35,9 @@ public sealed class S3ThumbnailSynchronizationService(
 
         foreach (var thumbnail in thumbnails.Where(item => !originalKeys.Contains(item.Key)))
         {
-            await s3Clients.Thumbnails.DeleteObjectAsync(new DeleteObjectRequest
+            await s3Clients.SpikylinS3.DeleteObjectAsync(new DeleteObjectRequest
             {
-                BucketName = options.ThumbnailBucket.BucketName,
+                BucketName = options.SpikylinS3Bucket.BucketName,
                 Key = thumbnail.Key,
             }, cancellationToken).ConfigureAwait(false);
 
@@ -46,22 +47,23 @@ public sealed class S3ThumbnailSynchronizationService(
 
     private async Task CreateThumbnailAsync(string sourceKey, string thumbnailKey, CancellationToken cancellationToken)
     {
-        using var sourceResponse = await s3Clients.Public.GetObjectAsync(new GetObjectRequest
+        using var sourceResponse = await s3Clients.SpikylinS3.GetObjectAsync(new GetObjectRequest
         {
-            BucketName = options.PublicBucket.BucketName,
+            BucketName = options.SpikylinS3Bucket.BucketName,
             Key = sourceKey,
         }, cancellationToken).ConfigureAwait(false);
 
-        var thumbnail = await thumbnailService.CreateAsync(sourceResponse.ResponseStream, cancellationToken).ConfigureAwait(false);
+        var thumbnail = await imageSharpService.CreateThumbnailAsync(sourceResponse.ResponseStream, cancellationToken).ConfigureAwait(false);
         await using var stream = new MemoryStream(thumbnail.Content, writable: false);
         try
         {
-            var uploadResponse = await s3Clients.Thumbnails.PutObjectAsync(new PutObjectRequest
+            var uploadResponse = await s3Clients.SpikylinS3.PutObjectAsync(new PutObjectRequest
             {
-                BucketName = options.ThumbnailBucket.BucketName,
+                BucketName = options.SpikylinS3Bucket.BucketName,
                 Key = thumbnailKey,
                 InputStream = stream,
-                ContentType = thumbnail.ContentType
+                ContentType = thumbnail.ContentType,
+                UseChunkEncoding = false,
             }, cancellationToken).ConfigureAwait(false);
         }
         catch (AmazonS3Exception exception)
@@ -77,18 +79,6 @@ public sealed class S3ThumbnailSynchronizationService(
             throw;
         }
 
-    }
-
-    private string GetThumbnailKey(string sourceKey)
-    {
-        var relativeKey = sourceKey.StartsWith(options.PublicBucket.Prefix, StringComparison.OrdinalIgnoreCase)
-            ? sourceKey[options.PublicBucket.Prefix.Length..]
-            : sourceKey;
-        var extension = Path.GetExtension(relativeKey);
-
-        return string.IsNullOrEmpty(extension)
-            ? $"{relativeKey}.webp"
-            : $"{relativeKey[..^extension.Length]}.webp";
     }
 
     private async Task<IReadOnlyList<StoredObject>> ListObjectsAsync(
@@ -128,11 +118,10 @@ public sealed class S3ThumbnailSynchronizationService(
 
 public sealed class S3ThumbnailSynchronizationWorker(
     S3ThumbnailSynchronizationService synchronizationService,
-    IConfiguration configuration,
     ILogger<S3ThumbnailSynchronizationWorker> logger) : BackgroundService
 {
     private readonly TimeSpan interval = TimeSpan.FromSeconds(
-        Math.Max(30, configuration.GetSection("S3").Get<S3PhotoOptions>()?.ThumbnailBucket.ThumbnailSyncIntervalSeconds ?? 300));
+        Math.Max(30, 300));
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

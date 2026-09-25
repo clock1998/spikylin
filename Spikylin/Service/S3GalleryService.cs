@@ -5,7 +5,7 @@ using MetadataExtractor.Formats.Exif;
 
 namespace Spikylin.Service;
 
-public sealed class S3PhotoCatalog(S3Clients s3Clients, IConfiguration configuration, ILogger<S3PhotoCatalog> logger)
+public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configuration, ILogger<S3GalleryService> logger)
 {
     private static readonly string[] ImageExtensions = [".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp"];
     private readonly S3PhotoOptions options = configuration.GetSection("S3").Get<S3PhotoOptions>() ?? new();
@@ -18,12 +18,12 @@ public sealed class S3PhotoCatalog(S3Clients s3Clients, IConfiguration configura
 
         do
         {
-            var response = await s3Clients.Public.ListObjectsV2Async(new ListObjectsV2Request
+            var response = await s3Clients.SpikylinS3.ListObjectsV2Async(new ListObjectsV2Request
             {
-                BucketName = options.PublicBucket.BucketName,
+                BucketName = options.SpikylinS3Bucket.BucketName,
                 ContinuationToken = continuationToken,
                 MaxKeys = 1_000,
-                Prefix = options.PublicBucket.Prefix,
+                Prefix = "gallery/",
             }, cancellationToken).ConfigureAwait(false);
 
             objects.AddRange((response.S3Objects ?? []).Select(item => new S3Object(item.Key, item.LastModified ?? DateTime.UtcNow)));
@@ -48,9 +48,9 @@ public sealed class S3PhotoCatalog(S3Clients s3Clients, IConfiguration configura
     {
         try
         {
-            using var response = await s3Clients.Public.GetObjectAsync(new GetObjectRequest
+            using var response = await s3Clients.SpikylinS3.GetObjectAsync(new GetObjectRequest
             {
-                BucketName = options.PublicBucket.BucketName,
+                BucketName = options.SpikylinS3Bucket.BucketName,
                 Key = item.Key,
             }, cancellationToken).ConfigureAwait(false);
 
@@ -101,7 +101,7 @@ public sealed class S3PhotoCatalog(S3Clients s3Clients, IConfiguration configura
     {
         var endpoint = options.Endpoint.TrimEnd('/');
         var escapedKey = string.Join('/', key.Split('/').Select(Uri.EscapeDataString));
-        return new Uri($"{endpoint}/{options.PublicBucket.BucketName}/{escapedKey}", UriKind.Absolute);
+        return new Uri($"{endpoint}/{options.SpikylinS3Bucket.BucketName}/{escapedKey}", UriKind.Absolute);
     }
 
     private static bool IsImage(S3Object item) => ImageExtensions.Contains(Path.GetExtension(item.Key), StringComparer.OrdinalIgnoreCase);
@@ -113,15 +113,11 @@ public sealed class S3PhotoCatalog(S3Clients s3Clients, IConfiguration configura
 public sealed class S3PhotoOptions
 {
     public string Endpoint { get; set; } = "https://s3.spikylin.com";
-    public List<S3BucketOptions> Buckets { get; set; } = [];
+    public List<S3BucketOptions> Buckets { get; set; } = new();
 
-    public S3BucketOptions PublicBucket =>
-        Buckets.FirstOrDefault(bucket => string.Equals(bucket.BucketName, "public", StringComparison.OrdinalIgnoreCase))
-        ?? new S3BucketOptions { BucketName = "public", Prefix = "photography/" };
-
-    public S3BucketOptions ThumbnailBucket =>
-        Buckets.FirstOrDefault(bucket => string.Equals(bucket.BucketName, "gallery-thumbnail", StringComparison.OrdinalIgnoreCase))
-        ?? new S3BucketOptions { BucketName = "gallery-thumbnail", ThumbnailSyncIntervalSeconds = 300 };
+    public S3BucketOptions SpikylinS3Bucket =>
+        Buckets.FirstOrDefault(bucket => string.Equals(bucket.BucketName, "spikylin-s3", StringComparison.OrdinalIgnoreCase))
+        ?? new S3BucketOptions { BucketName = "spikylin-s3", Prefix = "gallery/" };
 }
 
 public sealed class S3BucketOptions
@@ -130,7 +126,6 @@ public sealed class S3BucketOptions
     public string Prefix { get; set; } = string.Empty;
     public string AccessId { get; set; } = string.Empty;
     public string AccessSecret { get; set; } = string.Empty;
-    public int ThumbnailSyncIntervalSeconds { get; set; } = 300;
 }
 
 public sealed record PhotoMetadata(

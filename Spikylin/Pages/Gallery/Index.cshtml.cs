@@ -5,11 +5,11 @@ using Spikylin.Service;
 namespace Spikylin.Pages.Gallery;
 
 public class IndexModel(
-    S3PhotoCatalog photoCatalog,
+    S3GalleryService galleryService,
     IThumbnailService thumbnailService,
     ILogger<IndexModel> logger) : PageModel
 {
-    public IReadOnlyList<PhotoItem> Photos { get; private set; } = [];
+    public IReadOnlyList<PhotoItem> Photos { get; private set; } = new List<PhotoItem>();
 
     public string? LoadError { get; private set; }
 
@@ -17,7 +17,7 @@ public class IndexModel(
     {
         try
         {
-            var photos = await photoCatalog.GetPhotosAsync(cancellationToken);
+            var photos = await galleryService.GetPhotosAsync(cancellationToken);
             Photos = photos
                 .Select(photo => photo with
                 {

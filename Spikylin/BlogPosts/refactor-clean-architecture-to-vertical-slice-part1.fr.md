@@ -18,9 +18,9 @@ Bref, il y a trois raisons principales de refactorer mon projet.
 - Les fichiers sont éparpillés dans plusieurs projets et dossiers.
 
 L'ancien projet suivait la clean architecture et le repository pattern, comme on peut le voir sur l'image ci-dessous.
-![clean architecture](https://s3.spikylin.com/public/blog-images/homelab/refactor-clean-architecture-to-vertical-slice/clean-architecture.png "Clean Architecture")
+![clean architecture](https://spikylin-s3.spikylin.com/blog-images/homelab/refactor-clean-architecture-to-vertical-slice/clean-architecture.png "Clean Architecture")
 Mes entités sont toutes dans le projet Db. La logique métier vit dans le dossier des repositories. Et les contrôleurs sont dans le dossier controllers. La raison pour laquelle je ne les ai pas mis dans des projets séparés est que mon projet n'était pas particulièrement gros, mais il est courant de les séparer. Sous le dossier Repositories, j'ai créé un repository générique qui abstrait Entity Framework. L'idée était de réduire la répétition de code. Cette approche a des avantages et des inconvénients. Elle me permet de remplacer Entity Framework si je le souhaite, mais cette couche d'abstraction ajoute en réalité de la complexité. Plus tard, j'ai aussi appris que le repository pattern est redondant si je décide d'utiliser Entity Framework. Le framework lui-même est déjà une implémentation du repository pattern.
-![repository](https://s3.spikylin.com/public/blog-images/homelab/refactor-clean-architecture-to-vertical-slice/repository.png "Repository")
+![repository](https://spikylin-s3.spikylin.com/blog-images/homelab/refactor-clean-architecture-to-vertical-slice/repository.png "Repository")
 
 ```csharp
 public interface IRepository<T> where T : class
@@ -288,7 +288,7 @@ public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] Semester
 Cela fait fuir la logique métier vers le contrôleur, ce qui n'est pas une bonne chose.
 
 Un autre problème est que les DTO sont partout. Ils sont dans les contrôleurs et dans les repositories, et cela devient confus lorsqu'il existe plusieurs DTO qui se ressemblent. Je trouve aussi difficile de les nommer correctement selon leur cas d'usage précis. Pour la salle de chat à elle seule, j'ai déjà quatre DTO :
-![DTO](https://s3.spikylin.com/public/blog-images/homelab/refactor-clean-architecture-to-vertical-slice/DTO.png)
+![DTO](https://spikylin-s3.spikylin.com/blog-images/homelab/refactor-clean-architecture-to-vertical-slice/DTO.png)
 
 Le repository pattern a certains avantages, mais je ne le vois pas bien évoluer dans le temps, surtout qu'il n'est pas nécessaire si j'utilise Entity Framework. Il y a trop d'abstraction et trop de couches. La fonctionnalité "Go To Implementation" ne fonctionne parfois pas dans Visual Studio. Je vois bien que, lorsque le projet grossira, il deviendra difficile à maintenir avec différents projets, emplacements de fichiers et niveaux d'abstraction.
 

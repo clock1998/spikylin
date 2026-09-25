@@ -20,7 +20,7 @@ featured: false
 3. Choisissez votre fournisseur DNS et ajoutez votre clé API si nécessaire.
 4. Ajoutez un compte.
 5. Ajoutez le certificat à chaque nœud.
-![Node](https://s3.spikylin.com/public/blog-images/homelab/how-to-setup-certificate-for-your-proxmox/add-certificate-to-node.png)
-![Add Domain](https://s3.spikylin.com/public/blog-images/homelab/how-to-setup-certificate-for-your-proxmox/add-domain.png)
+![Node](https://spikylin-s3.spikylin.com/blog-images/homelab/how-to-setup-certificate-for-your-proxmox/add-certificate-to-node.png)
+![Add Domain](https://spikylin-s3.spikylin.com/blog-images/homelab/how-to-setup-certificate-for-your-proxmox/add-domain.png)
 
 ```

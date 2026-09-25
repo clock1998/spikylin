@@ -112,7 +112,7 @@ public sealed class S3PhotoCatalog(IAmazonS3 s3Client, IConfiguration configurat
 
 public sealed class S3PhotoOptions
 {
-    public string Endpoint { get; set; } = "https://s3.spikylin.com/public";
+    public string Endpoint { get; set; } = "https://spikylin-s3.spikylin.com";
     public string BucketName { get; set; } = "public";
     public string Prefix { get; set; } = "photography/";
 }

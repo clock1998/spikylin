@@ -1,0 +1,7 @@
+﻿@model Spikylin.Pages.Gallery.Partials._ModalImagePartialModel
+@{
+}
+<figure class="flex max-h-full max-w-full flex-col items-center gap-3">
+    <img src="@Model.Photo.Url" alt="@Model.Photo.Key" class="max-h-[calc(100vh-6rem)] max-w-full object-contain" />
+    <figcaption id="photo-modal-caption" class="max-w-full truncate text-sm text-white/80">@Model.Metadata.DisplayText</figcaption>
+</figure>

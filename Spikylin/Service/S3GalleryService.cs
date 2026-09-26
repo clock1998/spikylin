@@ -13,7 +13,7 @@ public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configu
     /// <summary>Loads the public image objects and orders them by their photo date.</summary>
     public async Task<IReadOnlyList<PhotoItem>> GetPhotosAsync(CancellationToken cancellationToken = default)
     {
-        var objects = new List<S3Object>();
+        var s3objects = new List<S3Object>();
         string? continuationToken = null;
 
         do
@@ -26,32 +26,31 @@ public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configu
                 Prefix = "gallery/",
             }, cancellationToken).ConfigureAwait(false);
 
-            objects.AddRange((response.S3Objects ?? []).Select(item => new S3Object(item.Key, item.LastModified ?? DateTime.UtcNow)));
+            s3objects.AddRange((response.S3Objects ?? []).Select(item => new S3Object(item.Key, item.LastModified ?? DateTime.UtcNow)));
             continuationToken = response.IsTruncated == true ? response.NextContinuationToken : null;
         }
         while (!string.IsNullOrWhiteSpace(continuationToken));
 
-        var photos = new List<PhotoItem>(objects.Count);
-        foreach (var item in objects.Where(IsImage))
+        var photos = new List<PhotoItem>(s3objects.Count);
+        foreach (var item in s3objects.Where(IsImage))
         {
-            var metadata = await GetPhotoMetadataAsync(item, cancellationToken).ConfigureAwait(false);
-            photos.Add(new PhotoItem(item.Key, BuildObjectUri(item.Key), metadata.Date, metadata.Details));
+            photos.Add(new PhotoItem(item.Key, BuildObjectUri(item.Key), item.LastModified));
         }
 
         return photos
-            .OrderByDescending(photo => photo.Date)
+            .OrderByDescending(photo => photo.LastModified)
             .ThenBy(photo => photo.Key, StringComparer.OrdinalIgnoreCase)
             .ToArray();
     }
 
-    private async Task<PhotoMetadataResult> GetPhotoMetadataAsync(S3Object item, CancellationToken cancellationToken)
+    public async Task<PhotoMetadata> GetPhotoMetadataAsync(string key, CancellationToken cancellationToken)
     {
         try
         {
             using var response = await s3Clients.SpikylinS3.GetObjectAsync(new GetObjectRequest
             {
                 BucketName = options.SpikylinS3Bucket.BucketName,
-                Key = item.Key,
+                Key = key,
             }, cancellationToken).ConfigureAwait(false);
 
             using var seekableStream = new MemoryStream();
@@ -60,30 +59,28 @@ public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configu
 
             var directories = ImageMetadataReader.ReadMetadata(seekableStream);
 
-            return new PhotoMetadataResult(
-                item.LastModified,
-                new PhotoMetadata(
+            return new PhotoMetadata(
                     GetExifValue<ExifIfd0Directory>(directories, ExifDirectoryBase.TagModel),
                     GetExifValue<ExifSubIfdDirectory>(directories, ExifDirectoryBase.TagDateTimeOriginal),
                     GetExifValue(directories, ExifDirectoryBase.TagFocalLength),
                     GetExifValue(directories, ExifDirectoryBase.TagFNumber),
                     GetExifValue(directories, ExifDirectoryBase.TagIsoEquivalent),
-                    GetExifValue(directories, ExifDirectoryBase.TagExposureTime)));
+                    GetExifValue(directories, ExifDirectoryBase.TagExposureTime));
         }
         catch (HttpRequestException exception)
         {
-            logger.LogWarning(exception, "Could not read metadata for photography object {ObjectKey}", item.Key);
+            logger.LogWarning(exception, "Could not read metadata for photography object {ObjectKey}", key );
         }
         catch (ImageProcessingException exception)
         {
-            logger.LogWarning(exception, "Could not read EXIF data for photography object {ObjectKey}", item.Key);
+            logger.LogWarning(exception, "Could not read EXIF data for photography object {ObjectKey}", key);
         }
         catch (AmazonS3Exception exception)
         {
-            logger.LogWarning(exception, "Could not download photography object {ObjectKey} for EXIF data", item.Key);
+            logger.LogWarning(exception, "Could not download photography object {ObjectKey} for EXIF data", key);
         }
 
-        return new PhotoMetadataResult(item.LastModified, new PhotoMetadata(null, null, null, null, null, null));
+        return new PhotoMetadata(null, null, null, null, null, null);
     }
 
     private static string? GetExifValue(IReadOnlyList<MetadataExtractor.Directory> directories, int tag) =>
@@ -99,20 +96,20 @@ public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configu
 
     private Uri BuildObjectUri(string key)
     {
-        var endpoint = options.Endpoint.TrimEnd('/');
+        var endpoint = options.WebsiteEndpoint.TrimEnd('/');
         var escapedKey = string.Join('/', key.Split('/').Select(Uri.EscapeDataString));
-        return new Uri($"{endpoint}/{options.SpikylinS3Bucket.BucketName}/{escapedKey}", UriKind.Absolute);
+        return new Uri($"{endpoint}/{escapedKey}", UriKind.Absolute);
     }
 
     private static bool IsImage(S3Object item) => ImageExtensions.Contains(Path.GetExtension(item.Key), StringComparer.OrdinalIgnoreCase);
 
-    private sealed record S3Object(string Key, DateTimeOffset LastModified);
-    private sealed record PhotoMetadataResult(DateTimeOffset Date, PhotoMetadata Details);
+    public sealed record S3Object(string Key, DateTimeOffset LastModified);
 }
 
 public sealed class S3PhotoOptions
 {
     public string Endpoint { get; set; } = "https://s3.spikylin.com";
+    public string WebsiteEndpoint { get; set; } = "https://s3.spikylin.com";   
     public List<S3BucketOptions> Buckets { get; set; } = new();
 
     public S3BucketOptions SpikylinS3Bucket =>
@@ -148,7 +145,7 @@ public sealed record PhotoMetadata(
         }.Where(value => !string.IsNullOrWhiteSpace(value)));
 }
 
-public sealed record PhotoItem(string Key, Uri Url, DateTimeOffset Date, PhotoMetadata Metadata)
+public sealed record PhotoItem(string Key, Uri Url, DateTimeOffset LastModified)
 {
     public string? ThumbnailUrl { get; init; }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Spikylin.Pages.Gallery.Partials;
 using Spikylin.Service;
 
 namespace Spikylin.Pages.Gallery;
@@ -43,5 +44,22 @@ public class IndexModel(
 
         var thumbnail = await thumbnailService.GetAsync(key, cancellationToken);
         return File(thumbnail.Content, thumbnail.ContentType);
+    }
+
+    public async Task<IActionResult> OnGetPhotoMetadataAsync(
+        PhotoItem photo,
+        CancellationToken cancellationToken)
+    {
+        if (photo is null)
+        {
+            return BadRequest();
+        }
+
+        var metadata = await galleryService.GetPhotoMetadataAsync(photo.Key, cancellationToken);
+        return Partial("Partials/_ModalImagePartial", new _ModalImagePartialModel
+        {
+            Photo = photo,
+            Metadata = metadata
+        });
     }
 }

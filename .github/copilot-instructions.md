@@ -29,3 +29,9 @@
 
 ## Project Guidelines
 - Use AWSSDK.S3 for the S3 photo catalog implementation, replacing direct S3-compatible HTTP/XML handling where appropriate.
+- Use separate S3 clients: anonymous credentials for the public source bucket, and authenticated service-account credentials for the thumbnail bucket and synchronization operations.
+
+## Thumbnail Management
+- Implement thumbnail synchronization as a background service using an admin-capable S3 service account.
+- Generate missing thumbnails from original photos in WebP format and delete thumbnails when originals are deleted.
+- Store thumbnails in a separate `gallery-thumbnail` bucket, ensuring the correct image content type when storing and serving them.

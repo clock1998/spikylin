@@ -1,4 +1,4 @@
-﻿namespace Spikylin.Model
+﻿namespace Spikylin.Core.Model
 {
     public class Post
     {

@@ -1,10 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using MetadataExtractor;
-using MetadataExtractor.Formats.Exif;
 using SixLabors.ImageSharp;
 using Spikylin.Core;
-using Spikylin.Core.Model;
 
 namespace Spikylin.Service.Worker
 {
@@ -49,13 +46,13 @@ namespace Spikylin.Service.Worker
             var thumbnails = await ListObjectsAsync(s3Clients.SpikylinS3, options.SpikylinS3Bucket.BucketName, "gallery-thumbnail/", cancellationToken).ConfigureAwait(false);
             var originalKeys = originals
                 .Where(item => Helper.IsImage(item.Key))
-                .Select(item => Helper.BuildThumbnailKey(options.SpikylinS3Bucket.Prefix, item.Key))
+                .Select(item => BuildThumbnailKey(options.SpikylinS3Bucket.Prefix, item.Key))
                 .ToHashSet(StringComparer.Ordinal);
             var thumbnailsByKey = thumbnails.Where(item => Helper.IsImage(item.Key)).ToDictionary(item => item.Key, StringComparer.Ordinal);
 
             foreach (var original in originals.Where(item => Helper.IsImage(item.Key)))
             {
-                var thumbnailKey = Helper.BuildThumbnailKey(options.SpikylinS3Bucket.Prefix, original.Key);
+                var thumbnailKey = BuildThumbnailKey(options.SpikylinS3Bucket.Prefix, original.Key);
                 if (!thumbnailsByKey.TryGetValue(thumbnailKey, out var thumbnail)
                     || original.LastModified > thumbnail.LastModified)
                 {
@@ -120,43 +117,6 @@ namespace Spikylin.Service.Worker
 
         }
 
-        private async Task<PhotoMetadata> GetPhotoMetadataAsync(Stream source, CancellationToken cancellationToken)
-        {
-            try
-            {
-                using var seekableStream = new MemoryStream();
-                await source.CopyToAsync(seekableStream, cancellationToken).ConfigureAwait(false);
-                seekableStream.Position = 0;
-
-                var directories = ImageMetadataReader.ReadMetadata(seekableStream);
-
-                return new PhotoMetadata(
-                        GetExifValue<ExifIfd0Directory>(directories, ExifDirectoryBase.TagModel),
-                        GetExifValue<ExifSubIfdDirectory>(directories, ExifDirectoryBase.TagDateTimeOriginal),
-                        GetExifValue(directories, ExifDirectoryBase.TagFocalLength),
-                        GetExifValue(directories, ExifDirectoryBase.TagFNumber),
-                        GetExifValue(directories, ExifDirectoryBase.TagIsoEquivalent),
-                        GetExifValue(directories, ExifDirectoryBase.TagExposureTime));
-            }
-            catch (SixLabors.ImageSharp.ImageProcessingException exception)
-            {
-                logger.LogWarning(exception, "Could not read EXIF data for photography object");
-            }
-
-            return new PhotoMetadata(null, null, null, null, null, null);
-        }
-
-        private static string? GetExifValue(IReadOnlyList<MetadataExtractor.Directory> directories, int tag) =>
-            GetExifValue<ExifSubIfdDirectory>(directories, tag);
-
-        private static string? GetExifValue<TDirectory>(IReadOnlyList<MetadataExtractor.Directory> directories, int tag)
-            where TDirectory : MetadataExtractor.Directory
-        {
-            return directories.OfType<TDirectory>()
-                .Select(directory => directory.GetDescription(tag))
-                .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
-        }
-
         private async Task<IReadOnlyList<StoredObject>> ListObjectsAsync(
             IAmazonS3 client,
             string bucketName,
@@ -184,6 +144,19 @@ namespace Spikylin.Service.Worker
             while (!string.IsNullOrWhiteSpace(continuationToken));
 
             return objects;
+        }
+
+        private string BuildThumbnailKey(string prefix, string sourceKey)
+        {
+            var relativeKey = sourceKey.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                ? sourceKey[prefix.Length..]
+                : sourceKey;
+            relativeKey = relativeKey.Replace("gallery", "gallery-thumbnail");
+            var extension = Path.GetExtension(sourceKey);
+
+            return string.IsNullOrEmpty(extension)
+                ? $"{relativeKey}.webp"
+                : $"{relativeKey[..^extension.Length]}.webp";
         }
         private sealed record StoredObject(string Key, DateTimeOffset LastModified);
     }

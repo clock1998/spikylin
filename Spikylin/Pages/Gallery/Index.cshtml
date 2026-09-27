@@ -27,7 +27,7 @@
             {
                 <button type="button"
                         class="group rounded-box bg-base-200 relative mb-4 block aspect-square w-full break-inside-avoid overflow-hidden text-left shadow-sm transition hover:shadow-xl hover:brightness-105 focus:outline-primary focus:outline-2 focus:outline-offset-2"
-                        hx-get="?handler=PhotoMetadata"
+                        hx-get="?handler=FullSizePhoto"
                         hx-vals='@Json.Serialize(new {
                             Key = thumbnail.Key,
                             Url = thumbnail.Url,

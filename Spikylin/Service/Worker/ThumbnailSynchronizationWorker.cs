@@ -95,13 +95,13 @@ namespace Spikylin.Service.Worker
                     ContentType = thumbnail.ContentType,
                     UseChunkEncoding = false,
                 };
-                request.Metadata.Add("x-amz-meta-camera-model", thumbnail.photoMetadata.CameraModel ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-date-taken", thumbnail.photoMetadata.DateTime ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-focal-length", thumbnail.photoMetadata.FocalLength ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-f-number", thumbnail.photoMetadata.Aperture ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-iso", thumbnail.photoMetadata.Iso ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-exposure-time", thumbnail.photoMetadata.ShutterSpeed ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-exif", thumbnail.photoMetadata.DisplayText ?? string.Empty);
+                request.Metadata.Add("x-amz-meta-camera-model", thumbnail.PhotoMetadata.CameraModel ?? string.Empty);
+                request.Metadata.Add("x-amz-meta-date-taken", thumbnail.PhotoMetadata.DateTime ?? string.Empty);
+                request.Metadata.Add("x-amz-meta-focal-length", thumbnail.PhotoMetadata.FocalLength ?? string.Empty);
+                request.Metadata.Add("x-amz-meta-f-number", thumbnail.PhotoMetadata.Aperture ?? string.Empty);
+                request.Metadata.Add("x-amz-meta-iso", thumbnail.PhotoMetadata.Iso ?? string.Empty);
+                request.Metadata.Add("x-amz-meta-exposure-time", thumbnail.PhotoMetadata.ShutterSpeed ?? string.Empty);
+                request.Metadata.Add("x-amz-meta-exif", thumbnail.PhotoMetadata.DisplayText ?? string.Empty);
                 request.Metadata.Add("x-amz-meta-original-photo-key", sourceKey ?? string.Empty);
                 var uploadResponse = await s3Clients.SpikylinS3.PutObjectAsync(request, cancellationToken).ConfigureAwait(false);
             }

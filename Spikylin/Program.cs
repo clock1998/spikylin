@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using Spikylin.Service;
+using Spikylin.Service.Worker;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);

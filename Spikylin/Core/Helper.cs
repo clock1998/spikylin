@@ -1,7 +1,9 @@
-﻿namespace Spikylin.Core
+﻿
+namespace Spikylin.Core
 {
     public static class Helper
     {
+        private static readonly string[] ImageExtensions = { ".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp" };
         public static string BuildThumbnailKey(string prefix, string sourceKey)
         {
             var relativeKey = sourceKey.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
@@ -14,5 +16,7 @@
                 ? $"{relativeKey}.webp"
                 : $"{relativeKey[..^extension.Length]}.webp";
         }
+
+        public static bool IsImage(string key) => ImageExtensions.Contains(Path.GetExtension(key), StringComparer.OrdinalIgnoreCase);
     }
 }

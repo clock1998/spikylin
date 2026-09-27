@@ -2,12 +2,12 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
+using Spikylin.Core;
 
 namespace Spikylin.Service;
 
 public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configuration, ILogger<S3GalleryService> logger)
 {
-    private static readonly string[] ImageExtensions = [".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp"];
     private readonly S3PhotoOptions options = configuration.GetSection("S3").Get<S3PhotoOptions>() ?? new();
 
     /// <summary>Loads the public image objects and orders them by their photo date.</summary>
@@ -32,7 +32,7 @@ public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configu
         while (!string.IsNullOrWhiteSpace(continuationToken));
 
         var photos = new List<PhotoItem>(s3objects.Count);
-        foreach (var item in s3objects.Where(IsImage))
+        foreach (var item in s3objects.Where(item => Helper.IsImage(item.Key)))
         {
             photos.Add(new PhotoItem(item.Key, BuildObjectUri(item.Key), item.LastModified));
         }
@@ -100,8 +100,6 @@ public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configu
         var escapedKey = string.Join('/', key.Split('/').Select(Uri.EscapeDataString));
         return new Uri($"{endpoint}/{escapedKey}", UriKind.Absolute);
     }
-
-    private static bool IsImage(S3Object item) => ImageExtensions.Contains(Path.GetExtension(item.Key), StringComparer.OrdinalIgnoreCase);
 
     public sealed record S3Object(string Key, DateTimeOffset LastModified);
 }

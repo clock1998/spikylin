@@ -1,4 +1,7 @@
+using MetadataExtractor;
+using MetadataExtractor.Formats.Exif;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
@@ -23,6 +26,7 @@ public sealed class ImageSharpService : IImageSharpService
         Stream source,
         CancellationToken cancellationToken = default)
     {
+
         using var image = await Image.LoadAsync(source, cancellationToken).ConfigureAwait(false);
 
         var exif = image.Metadata.ExifProfile;
@@ -34,24 +38,27 @@ public sealed class ImageSharpService : IImageSharpService
         string? iso = GetExifValue(exif, ExifTag.ISOSpeedRatings, FormatIso);
         string? exposureTime = GetExifValue(exif, ExifTag.ExposureTime, FormatExposureTime);
 
-        image.Mutate(context => context.Resize(new ResizeOptions
-        {
-            Size = new Size(ThumbnailSize, ThumbnailSize),
-            Mode = ResizeMode.Crop,
-            Position = AnchorPositionMode.Center,
-        }));
-
+        image.Mutate(context => {
+            context.AutoOrient(); 
+            context.Resize(new ResizeOptions
+            {
+                Size = new Size(ThumbnailSize, ThumbnailSize),
+                Mode = ResizeMode.Crop,
+                Position = AnchorPositionMode.Center,
+            });
+        });
+        
         await using var output = new MemoryStream();
 
         await image.SaveAsWebpAsync(
             output,
             new WebpEncoder { Quality = 82 },
             cancellationToken).ConfigureAwait(false);
-
+       
         return new ThumbnailResult(
             output.ToArray(),
             new PhotoMetadata(
-                CameraModel: cameraModel.Trim(),
+                CameraModel: cameraModel?.Trim(),
                 DateTime: dateTime,
                 FocalLength: focalLength,
                 Aperture: aperture,
@@ -95,7 +102,7 @@ public sealed class ImageSharpService : IImageSharpService
         return cleanText;
     }
 
-    private static string? FormatFocalLength(Rational value)
+    private static string? FormatFocalLength(SixLabors.ImageSharp.Rational value)
     {
         if (value.Denominator == 0)
             return null;
@@ -104,7 +111,7 @@ public sealed class ImageSharpService : IImageSharpService
         return $"{focalLength:0.#} mm";
     }
 
-    private static string? FormatAperture(Rational value)
+    private static string? FormatAperture(SixLabors.ImageSharp.Rational value)
     {
         if (value.Denominator == 0)
             return null;
@@ -121,7 +128,7 @@ public sealed class ImageSharpService : IImageSharpService
         return $"ISO {value[0]}";
     }
 
-    private static string? FormatExposureTime(Rational value)
+    private static string? FormatExposureTime(SixLabors.ImageSharp.Rational value)
     {
         if (value.Denominator == 0)
             return null;

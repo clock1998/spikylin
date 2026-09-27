@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Spikylin.Core.Model;
 using Spikylin.Pages.Gallery.Partials;
 using Spikylin.Service;
 
@@ -10,21 +11,17 @@ public class IndexModel(
     IThumbnailService thumbnailService,
     ILogger<IndexModel> logger) : PageModel
 {
-    public IReadOnlyList<PhotoItem> Photos { get; private set; } = new List<PhotoItem>();
+    public IReadOnlyList<PhotoThumbnail> Thumbnails { get; private set; } = new List<PhotoThumbnail>();
 
+    public record Photo(Uri Url, string Key, string Metadata);
     public string? LoadError { get; private set; }
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         try
         {
-            var photos = await galleryService.GetPhotosAsync(cancellationToken);
-            Photos = photos
-                .Select(photo => photo with
-                {
-                    ThumbnailUrl = Url.Page("/Gallery/Index", "Thumbnail", new { key = photo.Key }),
-                })
-                .ToArray();
+            var photos = await thumbnailService.GetThumbnailsAsync(cancellationToken);
+            Thumbnails = photos.ToArray();
         }
         catch (HttpRequestException exception)
         {
@@ -33,21 +30,21 @@ public class IndexModel(
         }
     }
 
-    public async Task<IActionResult> OnGetThumbnailAsync(
-        string key,
-        CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(key))
-        {
-            return BadRequest();
-        }
+    //public async Task<IActionResult> OnGetFullSizePhotoAsync(
+    //    string key,
+    //    CancellationToken cancellationToken)
+    //{
+    //    if (string.IsNullOrWhiteSpace(key))
+    //    {
+    //        return BadRequest();
+    //    }
 
-        var thumbnail = await thumbnailService.GetAsync(key, cancellationToken);
-        return File(thumbnail.Content, thumbnail.ContentType);
-    }
+    //    var thumbnail = await galleryService.GetFullSizePhotoAsync(key, cancellationToken);
+    //    return File(thumbnail.Content, thumbnail.ContentType);
+    //}
 
-    public async Task<IActionResult> OnGetPhotoMetadataAsync(
-        PhotoItem photo,
+    public async Task<IActionResult> OnGetFullSizePhotoAsync(
+        Photo photo,
         CancellationToken cancellationToken)
     {
         if (photo is null)
@@ -55,11 +52,11 @@ public class IndexModel(
             return BadRequest();
         }
 
-        var metadata = await galleryService.GetPhotoMetadataAsync(photo.Key, cancellationToken);
+        //var metadata = await galleryService.GetPhotoMetadataAsync(photo.Key, cancellationToken);
         return Partial("Partials/_ModalImagePartial", new _ModalImagePartialModel
         {
-            Photo = photo,
-            Metadata = metadata
+            Uri = photo.Url,
+            Metadata = photo.Metadata
         });
     }
 }

@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
-using Spikylin.Model;
 using Spikylin.Service;
 using System.Globalization;
-using PostModel = Spikylin.Model.Post;
+using PostModel = Spikylin.Core.Model.Post;
 
 namespace Spikylin.Pages.Blog
 {

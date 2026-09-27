@@ -8,143 +8,21 @@ namespace Spikylin.Service;
 
 public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configuration, ILogger<S3GalleryService> logger)
 {
-    private readonly S3PhotoOptions options = configuration.GetSection("S3").Get<S3PhotoOptions>() ?? new();
-
-    /// <summary>Loads the public image objects and orders them by their photo date.</summary>
-    public async Task<IReadOnlyList<PhotoItem>> GetPhotosAsync(CancellationToken cancellationToken = default)
+    private readonly S3Options options = configuration.GetSection("S3").Get<S3Options>() ?? new();
+    public record ThumbnailResult(byte[] Content, string ContentType);
+    public async Task<ThumbnailResult> GetFullSizePhotoAsync(
+        string key,
+        CancellationToken cancellationToken = default)
     {
-        var s3objects = new List<S3Object>();
-        string? continuationToken = null;
-
-        do
+        using var response = await s3Clients.SpikylinS3.GetObjectAsync(new GetObjectRequest
         {
-            var response = await s3Clients.SpikylinS3.ListObjectsV2Async(new ListObjectsV2Request
-            {
-                BucketName = options.SpikylinS3Bucket.BucketName,
-                ContinuationToken = continuationToken,
-                MaxKeys = 1_000,
-                Prefix = "gallery/",
-            }, cancellationToken).ConfigureAwait(false);
+            BucketName = options.SpikylinS3Bucket.BucketName,
+            Key = key,
+        }, cancellationToken).ConfigureAwait(false);
 
-            s3objects.AddRange((response.S3Objects ?? []).Select(item => new S3Object(item.Key, item.LastModified ?? DateTime.UtcNow)));
-            continuationToken = response.IsTruncated == true ? response.NextContinuationToken : null;
-        }
-        while (!string.IsNullOrWhiteSpace(continuationToken));
-
-        var photos = new List<PhotoItem>(s3objects.Count);
-        foreach (var item in s3objects.Where(item => Helper.IsImage(item.Key)))
-        {
-            photos.Add(new PhotoItem(item.Key, BuildObjectUri(item.Key), item.LastModified));
-        }
-
-        return photos
-            .OrderByDescending(photo => photo.LastModified)
-            .ThenBy(photo => photo.Key, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
+        await using var output = new MemoryStream();
+        await response.ResponseStream.CopyToAsync(output, cancellationToken).ConfigureAwait(false);
+        return new ThumbnailResult(output.ToArray(), response.Headers.ContentType ?? "image/jpeg");
     }
 
-    public async Task<PhotoMetadata> GetPhotoMetadataAsync(string key, CancellationToken cancellationToken)
-    {
-        try
-        {
-            using var response = await s3Clients.SpikylinS3.GetObjectAsync(new GetObjectRequest
-            {
-                BucketName = options.SpikylinS3Bucket.BucketName,
-                Key = key,
-            }, cancellationToken).ConfigureAwait(false);
-
-            using var seekableStream = new MemoryStream();
-            await response.ResponseStream.CopyToAsync(seekableStream, cancellationToken).ConfigureAwait(false);
-            seekableStream.Position = 0;
-
-            var directories = ImageMetadataReader.ReadMetadata(seekableStream);
-
-            return new PhotoMetadata(
-                    GetExifValue<ExifIfd0Directory>(directories, ExifDirectoryBase.TagModel),
-                    GetExifValue<ExifSubIfdDirectory>(directories, ExifDirectoryBase.TagDateTimeOriginal),
-                    GetExifValue(directories, ExifDirectoryBase.TagFocalLength),
-                    GetExifValue(directories, ExifDirectoryBase.TagFNumber),
-                    GetExifValue(directories, ExifDirectoryBase.TagIsoEquivalent),
-                    GetExifValue(directories, ExifDirectoryBase.TagExposureTime));
-        }
-        catch (HttpRequestException exception)
-        {
-            logger.LogWarning(exception, "Could not read metadata for photography object {ObjectKey}", key );
-        }
-        catch (ImageProcessingException exception)
-        {
-            logger.LogWarning(exception, "Could not read EXIF data for photography object {ObjectKey}", key);
-        }
-        catch (AmazonS3Exception exception)
-        {
-            logger.LogWarning(exception, "Could not download photography object {ObjectKey} for EXIF data", key);
-        }
-
-        return new PhotoMetadata(null, null, null, null, null, null);
-    }
-
-    private static string? GetExifValue(IReadOnlyList<MetadataExtractor.Directory> directories, int tag) =>
-        GetExifValue<ExifSubIfdDirectory>(directories, tag);
-
-    private static string? GetExifValue<TDirectory>(IReadOnlyList<MetadataExtractor.Directory> directories, int tag)
-        where TDirectory : MetadataExtractor.Directory
-    {
-        return directories.OfType<TDirectory>()
-            .Select(directory => directory.GetDescription(tag))
-            .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
-    }
-
-    private Uri BuildObjectUri(string key)
-    {
-        var endpoint = options.WebsiteEndpoint.TrimEnd('/');
-        var escapedKey = string.Join('/', key.Split('/').Select(Uri.EscapeDataString));
-        return new Uri($"{endpoint}/{escapedKey}", UriKind.Absolute);
-    }
-
-    public sealed record S3Object(string Key, DateTimeOffset LastModified);
 }
-
-public sealed class S3PhotoOptions
-{
-    public string Endpoint { get; set; } = "https://s3.spikylin.com";
-    public string WebsiteEndpoint { get; set; } = "https://s3.spikylin.com";   
-    public List<S3BucketOptions> Buckets { get; set; } = new();
-
-    public S3BucketOptions SpikylinS3Bucket =>
-        Buckets.FirstOrDefault(bucket => string.Equals(bucket.BucketName, "spikylin-s3", StringComparison.OrdinalIgnoreCase))
-        ?? new S3BucketOptions { BucketName = "spikylin-s3", Prefix = "gallery/" };
-}
-
-public sealed class S3BucketOptions
-{
-    public string BucketName { get; set; } = string.Empty;
-    public string Prefix { get; set; } = string.Empty;
-    public string AccessId { get; set; } = string.Empty;
-    public string AccessSecret { get; set; } = string.Empty;
-}
-
-public sealed record PhotoMetadata(
-    string? CameraModel,
-    string? DateTime,
-    string? FocalLength,
-    string? Aperture,
-    string? Iso,
-    string? ShutterSpeed)
-{
-    public string DisplayText => string.Join(" · ",
-        new[]
-        {
-            CameraModel,
-            DateTime,
-            FocalLength,
-            Aperture,
-            Iso is null ? null : $"ISO {Iso}",
-            ShutterSpeed,
-        }.Where(value => !string.IsNullOrWhiteSpace(value)));
-}
-
-public sealed record PhotoItem(string Key, Uri Url, DateTimeOffset LastModified)
-{
-    public string? ThumbnailUrl { get; init; }
-}
-

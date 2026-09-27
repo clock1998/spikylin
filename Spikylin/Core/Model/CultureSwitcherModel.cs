@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Spikylin.Model
+namespace Spikylin.Core.Model
 {
     public class CultureSwitcherModel
     {

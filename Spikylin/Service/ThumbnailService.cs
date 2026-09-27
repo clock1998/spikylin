@@ -1,38 +1,75 @@
-using Amazon.S3;
 using Amazon.S3.Model;
 using Spikylin.Core;
+using Spikylin.Core.Model;
 
 namespace Spikylin.Service;
 
 public interface IThumbnailService
 {
-    Task<ThumbnailResult> GetAsync(
-        string key,
-        CancellationToken cancellationToken = default);
+    public Task<IReadOnlyList<PhotoThumbnail>> GetThumbnailsAsync(CancellationToken cancellationToken = default);
 }
+public record PhotoThumbnail(string Key, Uri Url, PhotoMetadata PhotoMetadata);
 
-public sealed record ThumbnailResult(byte[] Content, string ContentType);
-
-public sealed class ThumbnailService(
+public class ThumbnailService(
     S3Clients s3Clients,
     IConfiguration configuration) : IThumbnailService
 {
-    private const int ThumbnailSize = 600;
-    private readonly S3PhotoOptions options =
-        configuration.GetSection("S3").Get<S3PhotoOptions>() ?? new();
-
-    public async Task<ThumbnailResult> GetAsync(
-        string key,
-        CancellationToken cancellationToken = default)
+    private readonly S3Options options =
+    configuration.GetSection("S3").Get<S3Options>() ?? new();
+    public async Task<IReadOnlyList<PhotoThumbnail>> GetThumbnailsAsync(CancellationToken cancellationToken = default)
     {
-        using var response = await s3Clients.SpikylinS3.GetObjectAsync(new GetObjectRequest
-        {
-            BucketName = options.SpikylinS3Bucket.BucketName,            
-            Key = Helper.BuildThumbnailKey(options.SpikylinS3Bucket.Prefix, key),
-        }, cancellationToken).ConfigureAwait(false);
+        var s3objects = new List<S3Object>();
+        string? continuationToken = null;
 
-        await using var output = new MemoryStream();
-        await response.ResponseStream.CopyToAsync(output, cancellationToken).ConfigureAwait(false);
-        return new ThumbnailResult(output.ToArray(), response.Headers.ContentType ?? "image/jpeg");
+        do
+        {
+            var response = await s3Clients.SpikylinS3.ListObjectsV2Async(new ListObjectsV2Request
+            {
+                BucketName = options.SpikylinS3Bucket.BucketName,
+                ContinuationToken = continuationToken,
+                MaxKeys = 1_000,
+                Prefix = "gallery-thumbnail/",
+            }, cancellationToken).ConfigureAwait(false);
+            s3objects.AddRange((response.S3Objects ?? []).Select(item => new S3Object(item.Key, item.LastModified ?? DateTime.UtcNow)));
+            continuationToken = response.IsTruncated == true ? response.NextContinuationToken : null;
+        }
+        while (!string.IsNullOrWhiteSpace(continuationToken));
+
+        var thumbnails = new List<PhotoThumbnail>(s3objects.Count);
+        foreach (var item in s3objects.Where(item => Helper.IsImage(item.Key)))
+        {
+            var metadata = await s3Clients.SpikylinS3.GetObjectMetadataAsync(
+            new GetObjectMetadataRequest
+            {
+                BucketName = options.SpikylinS3Bucket.BucketName,
+                Key = item.Key
+            },
+            cancellationToken);
+            var photoMetadata = new PhotoMetadata(
+                metadata.Metadata["x-amz-meta-camera-model"],
+                metadata.Metadata["x-amz-meta-date-taken"],
+                metadata.Metadata["x-amz-meta-focal-length"],
+                metadata.Metadata["x-amz-meta-f-number"],
+                metadata.Metadata["x-amz-meta-iso"],
+                metadata.Metadata["x-amz-meta-exposure-time"]);
+            thumbnails.Add(new PhotoThumbnail(item.Key, BuildUri(options.WebsiteEndpoint, item.Key), photoMetadata));
+        }
+
+        return thumbnails
+            .OrderByDescending(thumbnail => thumbnail.PhotoMetadata.DateTime)
+            .ThenBy(thumbnail => thumbnail.Key, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
     }
+
+
+    private Uri BuildUri(string baseurl, string key)
+    {
+        var endpoint = baseurl.TrimEnd('/');
+        var escapedKey = string.Join('/', key.Split('/').Select(Uri.EscapeDataString));
+        return new Uri($"{endpoint}/{escapedKey}", UriKind.Absolute);
+    }
+    private sealed record S3Object(string Key, DateTimeOffset LastModified);
+
+    private const int ThumbnailSize = 600;
+
 }

@@ -1,4 +1,4 @@
-﻿@using Spikylin.Model
+﻿@using Spikylin.Core.Model
 @model IEnumerable<Post>
 
 <div id="posts" class="space-y-3">
@@ -6,14 +6,14 @@
 	{
 		@foreach (var post in Model)
 		{
-			<a asp-page="/Post/Post" asp-route-fileName="@post.FileName" class="card border border-base-300 bg-base-100 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+			<a asp-page="/Post/Post" asp-route-fileName="@post.FileName" class="card border-base-300 bg-base-100 border shadow-sm transition hover:border-primary/40 hover:shadow-md">
 				<div class="card-body gap-3 sm:flex-row sm:items-start sm:justify-between">
 					<div class="min-w-0 flex-1 space-y-2">
-						<div class="text-sm text-base-content/60">@post.Markdown.Meta.Date.ToString("yyyy-MM-dd")</div>
-						<h3 class="text-lg font-semibold text-base-content break-words">@post.Markdown.Meta.Title</h3>
+						<div class="text-base-content/60 text-sm">@post.Markdown.Meta.Date.ToString("yyyy-MM-dd")</div>
+						<h3 class="text-base-content text-lg font-semibold break-words">@post.Markdown.Meta.Title</h3>
 						@if (!string.IsNullOrWhiteSpace(post.Markdown.Meta.Description))
 						{
-							<p class="line-clamp-2 text-sm leading-6 text-base-content/75">@post.Markdown.Meta.Description</p>
+							<p class="text-base-content/75 line-clamp-2 text-sm leading-6">@post.Markdown.Meta.Description</p>
 						}
 					</div>
 					<div class="flex flex-wrap gap-2 sm:max-w-xs sm:justify-end">
@@ -28,7 +28,7 @@
 	}
 	else
 	{
-		<div class="rounded-box border border-dashed border-base-300 bg-base-100 p-6 text-sm text-base-content/70">
+		<div class="rounded-box border-base-300 bg-base-100 text-base-content/70 border border-dashed p-6 text-sm">
 			No posts found for this filter.
 		</div>
 	}

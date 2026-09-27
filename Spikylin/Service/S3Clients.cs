@@ -5,7 +5,7 @@ namespace Spikylin.Service;
 
 public sealed class S3Clients : IDisposable
 {
-    public S3Clients(S3PhotoOptions options)
+    public S3Clients(S3Options options)
     {
         var endpoint = new Uri(options.Endpoint);
         var clientConfig = new AmazonS3Config

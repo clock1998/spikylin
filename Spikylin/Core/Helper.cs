@@ -16,7 +16,12 @@ namespace Spikylin.Core
                 ? $"{relativeKey}.webp"
                 : $"{relativeKey[..^extension.Length]}.webp";
         }
-
+        public static Uri BuildUri(string baseurl, string key)
+        {
+            var endpoint = baseurl.TrimEnd('/');
+            var escapedKey = string.Join('/', key.Split('/').Select(Uri.EscapeDataString));
+            return new Uri($"{endpoint}/{escapedKey}", UriKind.Absolute);
+        }
         public static bool IsImage(string key) => ImageExtensions.Contains(Path.GetExtension(key), StringComparer.OrdinalIgnoreCase);
     }
 }

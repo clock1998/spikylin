@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Spikylin.Core;
 using Spikylin.Core.Model;
 using Spikylin.Pages.Gallery.Partials;
 using Spikylin.Service;
@@ -9,8 +10,10 @@ namespace Spikylin.Pages.Gallery;
 public class IndexModel(
     S3GalleryService galleryService,
     IThumbnailService thumbnailService,
+    IConfiguration configuration,
     ILogger<IndexModel> logger) : PageModel
 {
+    private readonly S3Options options = configuration.GetSection("S3").Get<S3Options>() ?? new();
     public IReadOnlyList<PhotoThumbnail> Thumbnails { get; private set; } = new List<PhotoThumbnail>();
 
     public record Photo(Uri Url, string Key, string Metadata);
@@ -55,7 +58,7 @@ public class IndexModel(
         //var metadata = await galleryService.GetPhotoMetadataAsync(photo.Key, cancellationToken);
         return Partial("Partials/_ModalImagePartial", new _ModalImagePartialModel
         {
-            Uri = photo.Url,
+            Uri = Helper.BuildUri(options.WebsiteEndpoint, photo.Key),
             Metadata = photo.Metadata
         });
     }

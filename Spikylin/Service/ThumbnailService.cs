@@ -14,8 +14,7 @@ public class ThumbnailService(
     S3Clients s3Clients,
     IConfiguration configuration) : IThumbnailService
 {
-    private readonly S3Options options =
-    configuration.GetSection("S3").Get<S3Options>() ?? new();
+    private readonly S3Options options = configuration.GetSection("S3").Get<S3Options>() ?? new();
     public async Task<IReadOnlyList<PhotoThumbnail>> GetThumbnailsAsync(CancellationToken cancellationToken = default)
     {
         var s3objects = new List<S3Object>();
@@ -51,8 +50,9 @@ public class ThumbnailService(
                 metadata.Metadata["x-amz-meta-focal-length"],
                 metadata.Metadata["x-amz-meta-f-number"],
                 metadata.Metadata["x-amz-meta-iso"],
-                metadata.Metadata["x-amz-meta-exposure-time"]);
-            thumbnails.Add(new PhotoThumbnail(item.Key, BuildUri(options.WebsiteEndpoint, item.Key), photoMetadata));
+                metadata.Metadata["x-amz-meta-exposure-time"],
+                metadata.Metadata["x-amz-meta-original-photo-key"]);
+            thumbnails.Add(new PhotoThumbnail(item.Key, Helper.BuildUri(options.WebsiteEndpoint, item.Key), photoMetadata));
         }
 
         return thumbnails
@@ -61,13 +61,6 @@ public class ThumbnailService(
             .ToArray();
     }
 
-
-    private Uri BuildUri(string baseurl, string key)
-    {
-        var endpoint = baseurl.TrimEnd('/');
-        var escapedKey = string.Join('/', key.Split('/').Select(Uri.EscapeDataString));
-        return new Uri($"{endpoint}/{escapedKey}", UriKind.Absolute);
-    }
     private sealed record S3Object(string Key, DateTimeOffset LastModified);
 
     private const int ThumbnailSize = 600;

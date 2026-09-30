@@ -2,6 +2,8 @@
 using Amazon.S3.Model;
 using SixLabors.ImageSharp;
 using Spikylin.Core;
+using Spikylin.Core.Model;
+using System.Text.Json;
 
 namespace Spikylin.Service.Worker
 {
@@ -49,18 +51,18 @@ namespace Spikylin.Service.Worker
                 .Select(item => BuildThumbnailKey(options.SpikylinS3Bucket.Prefix, item.Key))
                 .ToHashSet(StringComparer.Ordinal);
             var thumbnailsByKey = thumbnails.Where(item => Helper.IsImage(item.Key)).ToDictionary(item => item.Key, StringComparer.Ordinal);
-
+            List<PhotoThumbnail> newOrUpdatedThumbnails = new List<PhotoThumbnail>();
             foreach (var original in originals.Where(item => Helper.IsImage(item.Key)))
             {
                 var thumbnailKey = BuildThumbnailKey(options.SpikylinS3Bucket.Prefix, original.Key);
                 if (!thumbnailsByKey.TryGetValue(thumbnailKey, out var thumbnail)
                     || original.LastModified > thumbnail.LastModified)
                 {
-                    await UploadThumbnailAsync(original.Key, thumbnailKey, cancellationToken).ConfigureAwait(false);
+                    newOrUpdatedThumbnails.Add(await UploadThumbnailAsync(original.Key, thumbnailKey, cancellationToken).ConfigureAwait(false));
                 }
             }
-
-            foreach (var thumbnail in thumbnails.Where(item => !originalKeys.Contains(item.Key)))
+            var orphanedThumbnails = thumbnails.Where(item => !originalKeys.Contains(item.Key));
+            foreach (var thumbnail in orphanedThumbnails)
             {
                 await s3Clients.SpikylinS3.DeleteObjectAsync(new DeleteObjectRequest
                 {
@@ -70,14 +72,53 @@ namespace Spikylin.Service.Worker
 
                 logger.LogInformation("Deleted orphaned thumbnail {ThumbnailKey}", thumbnail.Key);
             }
+            
+            using var existingManifest = await s3Clients.SpikylinS3.GetObjectAsync(new GetObjectRequest
+            {
+                BucketName = options.SpikylinS3Bucket.BucketName,
+                Key = "manifest.json"
+            }, cancellationToken).ConfigureAwait(false);
+
+            var existingThumbnails = await JsonSerializer.DeserializeAsync<List<PhotoThumbnail>>(
+                existingManifest.ResponseStream, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if(existingThumbnails is not null)
+            {
+                existingThumbnails.RemoveAll(thumbnail => orphanedThumbnails.Any(orphan => orphan.Key == thumbnail.Key));
+                existingThumbnails.AddRange(newOrUpdatedThumbnails);
+                var jsonOptions = new JsonSerializerOptions { WriteIndented = false };
+                var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(existingThumbnails, jsonOptions);
+                await using var stream = new MemoryStream(jsonBytes);
+                await s3Clients.SpikylinS3.PutObjectAsync(new PutObjectRequest
+                {
+                    BucketName = options.SpikylinS3Bucket.BucketName,
+                    Key = "manifest.json",
+                    InputStream = stream,
+                    ContentType = "application/json",
+                    UseChunkEncoding = false
+                }, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                var jsonOptions = new JsonSerializerOptions { WriteIndented = false };
+                var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(newOrUpdatedThumbnails, jsonOptions);
+                await using var stream = new MemoryStream(jsonBytes);
+                await s3Clients.SpikylinS3.PutObjectAsync(new PutObjectRequest
+                {
+                    BucketName = options.SpikylinS3Bucket.BucketName,
+                    Key = "manifest.json",
+                    InputStream = stream,
+                    ContentType = "application/json",
+                    UseChunkEncoding = false
+                }, cancellationToken).ConfigureAwait(false);
+            }
         }
 
-        private async Task UploadThumbnailAsync(string sourceKey, string thumbnailKey, CancellationToken cancellationToken)
+        private async Task<PhotoThumbnail> UploadThumbnailAsync(string originalPhotoKey, string thumbnailKey, CancellationToken cancellationToken)
         {
             using var sourceResponse = await s3Clients.SpikylinS3.GetObjectAsync(new GetObjectRequest
             {
                 BucketName = options.SpikylinS3Bucket.BucketName,
-                Key = sourceKey,
+                Key = originalPhotoKey,
             }, cancellationToken).ConfigureAwait(false);
             var thumbnail = await imageSharpService.CreateThumbnailAsync(sourceResponse.ResponseStream, cancellationToken).ConfigureAwait(false);
             
@@ -92,15 +133,17 @@ namespace Spikylin.Service.Worker
                     ContentType = thumbnail.ContentType,
                     UseChunkEncoding = false,
                 };
-                request.Metadata.Add("x-amz-meta-camera-model", thumbnail.PhotoMetadata.CameraModel ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-date-taken", thumbnail.PhotoMetadata.DateTime ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-focal-length", thumbnail.PhotoMetadata.FocalLength ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-f-number", thumbnail.PhotoMetadata.Aperture ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-iso", thumbnail.PhotoMetadata.Iso ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-exposure-time", thumbnail.PhotoMetadata.ShutterSpeed ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-exif", thumbnail.PhotoMetadata.DisplayText ?? string.Empty);
-                request.Metadata.Add("x-amz-meta-original-photo-key", sourceKey ?? string.Empty);
+                var metadata = new PhotoMetadata(
+                    thumbnail.PhotoMetadata.CameraModel ?? string.Empty,
+                    thumbnail.PhotoMetadata.DateTime ?? string.Empty,
+                    thumbnail.PhotoMetadata.FocalLength ?? string.Empty,
+                    thumbnail.PhotoMetadata.Aperture ?? string.Empty,
+                    thumbnail.PhotoMetadata.Iso ?? string.Empty,
+                    thumbnail.PhotoMetadata.ShutterSpeed ?? string.Empty,
+                    Helper.BuildUri(options.WebsiteEndpoint, originalPhotoKey).AbsoluteUri
+                );                
                 var uploadResponse = await s3Clients.SpikylinS3.PutObjectAsync(request, cancellationToken).ConfigureAwait(false);
+                return new PhotoThumbnail (thumbnailKey, Helper.BuildUri(options.WebsiteEndpoint, thumbnailKey), metadata);
             }
             catch (AmazonS3Exception exception)
             {

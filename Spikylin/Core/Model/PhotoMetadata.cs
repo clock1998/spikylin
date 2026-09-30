@@ -7,7 +7,7 @@
         string? Aperture,
         string? Iso,
         string? ShutterSpeed,
-        string? OriginalPhotoKey = null)
+        string? OriginalPhotoUrl = null)
     {
         public string DisplayText => string.Join("|",
             new[]

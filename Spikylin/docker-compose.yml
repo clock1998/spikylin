@@ -8,6 +8,8 @@ services:
       - 80:80
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - S3__Buckets__0__AccessId=${SPIKYLIN_S3_ACCESS_ID}
+      - S3__Buckets__0__AccessSecret=${SPIKYLIN_S3_ACCESS_SECRET}
       - ASPNETCORE_HTTP_PORTS=80
     container_name: spikylin
     restart: always

@@ -3,10 +3,11 @@ using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
 using Spikylin.Features.Gallery.Dto;
+using Spikylin.Features.Gallery.Services.Interfaces;
 using System.Globalization;
 using System.Text;
 
-namespace Spikylin.Features.Gallery;
+namespace Spikylin.Features.Gallery.Services;
 
 public sealed class ImageSharpService : IImageSharpService
 {

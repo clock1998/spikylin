@@ -1,9 +1,11 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Spikylin.Features.Gallery.Dto;
+using Spikylin.Features.Gallery.Services.Interfaces;
+using Spikylin.Features.Shared;
 using System.Text.Json;
 
-namespace Spikylin.Features.Gallery;
+namespace Spikylin.Features.Gallery.Services;
 
 public class ThumbnailService(
     S3Clients s3Clients,
@@ -24,7 +26,6 @@ public class ThumbnailService(
                 response.ResponseStream, cancellationToken: cancellationToken).ConfigureAwait(false);
             return thumbnails!
                     .OrderByDescending(thumbnail => thumbnail.PhotoMetadata.DateTime)
-                    .ThenBy(thumbnail => thumbnail.Key, StringComparer.OrdinalIgnoreCase)
                     .ToArray();
         }
         catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)

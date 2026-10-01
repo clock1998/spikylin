@@ -1,5 +1,4 @@
-﻿
-namespace Spikylin.Core
+﻿namespace Spikylin.Features.Shared
 {
     public static class Helper
     {

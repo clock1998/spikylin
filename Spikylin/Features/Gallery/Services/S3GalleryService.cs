@@ -1,6 +1,7 @@
 using Amazon.S3.Model;
+using Spikylin.Features.Shared;
 
-namespace Spikylin.Features.Gallery;
+namespace Spikylin.Features.Gallery.Services;
 
 public sealed class S3GalleryService(
     S3Clients s3Clients, 

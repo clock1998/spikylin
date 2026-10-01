@@ -1,17 +1,17 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using SixLabors.ImageSharp;
-using Spikylin.Core;
 using Spikylin.Features.Gallery.Dto;
+using Spikylin.Features.Gallery.Services.Interfaces;
 using System.Text.Json;
 
-namespace Spikylin.Features.Gallery
+namespace Spikylin.Features.Shared
 {
     public sealed class S3ThumbnailSynchronizationWorker(
-    S3Clients s3Clients,
-    IImageSharpService imageSharpService,
-    IConfiguration configuration,
-    ILogger<S3ThumbnailSynchronizationWorker> logger) : BackgroundService
+        S3Clients s3Clients,
+        IImageSharpService imageSharpService,
+        IConfiguration configuration,
+        ILogger<S3ThumbnailSynchronizationWorker> logger) : BackgroundService
     {
         private readonly S3Options options = configuration.GetSection("S3").Get<S3Options>() ?? new();
 

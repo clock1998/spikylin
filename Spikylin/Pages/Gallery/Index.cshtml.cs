@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Spikylin.Features.Gallery;
 using Spikylin.Features.Gallery.Dto;
+using Spikylin.Features.Gallery.Services.Interfaces;
 using Spikylin.Pages.Gallery.Partials;
 
 namespace Spikylin.Pages.Gallery;

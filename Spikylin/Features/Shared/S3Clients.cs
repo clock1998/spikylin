@@ -1,7 +1,7 @@
 using Amazon.Runtime;
 using Amazon.S3;
 
-namespace Spikylin.Features.Gallery;
+namespace Spikylin.Features.Shared;
 
 public sealed class S3Clients : IDisposable
 {

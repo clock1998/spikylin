@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using Spikylin;
 using Spikylin.Features.Blog;
-using Spikylin.Features.Gallery;
+using Spikylin.Features.Gallery.Services;
+using Spikylin.Features.Gallery.Services.Interfaces;
+using Spikylin.Features.Shared;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);

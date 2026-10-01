@@ -1,6 +1,6 @@
 using Spikylin.Features.Gallery.Dto;
 
-namespace Spikylin.Features.Gallery;
+namespace Spikylin.Features.Gallery.Services.Interfaces;
 
 public interface IImageSharpService
 {

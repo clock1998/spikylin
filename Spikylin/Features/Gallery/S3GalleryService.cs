@@ -1,12 +1,11 @@
-using Amazon.S3;
 using Amazon.S3.Model;
-using MetadataExtractor;
-using MetadataExtractor.Formats.Exif;
-using Spikylin.Core;
 
 namespace Spikylin.Features.Gallery;
 
-public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configuration, ILogger<S3GalleryService> logger)
+public sealed class S3GalleryService(
+    S3Clients s3Clients, 
+    IConfiguration configuration, 
+    ILogger<S3GalleryService> logger)
 {
     private readonly S3Options options = configuration.GetSection("S3").Get<S3Options>() ?? new();
     public record ThumbnailResult(byte[] Content, string ContentType);

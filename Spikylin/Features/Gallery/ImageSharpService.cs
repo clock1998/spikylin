@@ -8,13 +8,6 @@ using System.Text;
 
 namespace Spikylin.Features.Gallery;
 
-public interface IImageSharpService
-{
-    Task<ThumbnailResult> CreateThumbnailAsync(
-        Stream source,
-        CancellationToken cancellationToken = default);
-}
-
 public sealed class ImageSharpService : IImageSharpService
 {
     private const int ThumbnailSize = 600;

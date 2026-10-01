@@ -1,16 +1,9 @@
 using Amazon.S3;
 using Amazon.S3.Model;
-using Spikylin.Core;
 using Spikylin.Features.Gallery.Dto;
 using System.Text.Json;
 
 namespace Spikylin.Features.Gallery;
-
-public interface IThumbnailService
-{
-    public Task<IReadOnlyList<PhotoThumbnail>> GetThumbnailsAsync(CancellationToken cancellationToken = default);
-}
-public record PhotoThumbnail(string Key, Uri Url, PhotoMetadata PhotoMetadata);
 
 public class ThumbnailService(
     S3Clients s3Clients,

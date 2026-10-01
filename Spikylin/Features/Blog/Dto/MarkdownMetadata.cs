@@ -1,4 +1,4 @@
-namespace Spikylin.Core.Model;
+namespace Spikylin.Features.Blog.Dto;
 
 public class MarkdownMetadata
 {

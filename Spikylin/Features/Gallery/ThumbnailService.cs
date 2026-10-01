@@ -1,10 +1,10 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Spikylin.Core;
-using Spikylin.Core.Model;
+using Spikylin.Features.Gallery.Dto;
 using System.Text.Json;
 
-namespace Spikylin.Service;
+namespace Spikylin.Features.Gallery;
 
 public interface IThumbnailService
 {

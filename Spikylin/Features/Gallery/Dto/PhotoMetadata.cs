@@ -1,4 +1,4 @@
-﻿namespace Spikylin.Core.Model
+﻿namespace Spikylin.Features.Gallery.Dto
 {
     public record PhotoMetadata(
         string? CameraModel,

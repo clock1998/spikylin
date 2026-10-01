@@ -4,7 +4,7 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 using Spikylin.Core;
 
-namespace Spikylin.Service;
+namespace Spikylin.Features.Gallery;
 
 public sealed class S3GalleryService(S3Clients s3Clients, IConfiguration configuration, ILogger<S3GalleryService> logger)
 {

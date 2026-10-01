@@ -1,13 +1,13 @@
 using Markdig;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
-using Spikylin.Core.Model;
+using Spikylin.Features.Blog.Dto;
 using System.Net;
 using System.Text.RegularExpressions;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace Spikylin.Service;
+namespace Spikylin.Features.Blog;
 
 public class MarkdigMarkdownService : IMarkdownService
 {
@@ -26,7 +26,7 @@ public class MarkdigMarkdownService : IMarkdownService
     /// <param name="markdown">The markdown source to parse.</param>
     /// <param name="filePath">The source file path used for diagnostics.</param>
     /// <returns>A parsed markdown result with metadata and rendered HTML.</returns>
-    public Core.Model.Markdown Parse(string markdown, string? filePath = null)
+    public Dto.MarkdownContent Parse(string markdown, string? filePath = null)
     {
         ArgumentNullException.ThrowIfNull(markdown);
 
@@ -67,7 +67,7 @@ public class MarkdigMarkdownService : IMarkdownService
             },
             RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
-        return new Spikylin.Core.Model.Markdown
+        return new MarkdownContent
         {
             Meta = meta,
             Html = html

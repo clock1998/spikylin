@@ -2,10 +2,10 @@
 using Amazon.S3.Model;
 using SixLabors.ImageSharp;
 using Spikylin.Core;
-using Spikylin.Core.Model;
+using Spikylin.Features.Gallery.Dto;
 using System.Text.Json;
 
-namespace Spikylin.Service.Worker
+namespace Spikylin.Features.Gallery
 {
     public sealed class S3ThumbnailSynchronizationWorker(
     S3Clients s3Clients,

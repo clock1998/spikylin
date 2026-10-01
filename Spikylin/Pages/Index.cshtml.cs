@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Spikylin.Service;
+using Spikylin.Features.Blog;
 using System.Globalization;
 
 namespace Spikylin.Pages

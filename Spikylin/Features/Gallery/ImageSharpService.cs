@@ -1,15 +1,12 @@
-using MetadataExtractor;
-using MetadataExtractor.Formats.Exif;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
-using Spikylin.Core.Model;
+using Spikylin.Features.Gallery.Dto;
 using System.Globalization;
 using System.Text;
 
-namespace Spikylin.Service;
+namespace Spikylin.Features.Gallery;
 
 public interface IImageSharpService
 {

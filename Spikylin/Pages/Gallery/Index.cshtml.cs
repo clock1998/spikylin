@@ -1,14 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Spikylin.Core;
-using Spikylin.Core.Model;
+using Spikylin.Features.Gallery;
 using Spikylin.Pages.Gallery.Partials;
-using Spikylin.Service;
 
 namespace Spikylin.Pages.Gallery;
 
 public class IndexModel(
-    S3GalleryService galleryService,
     IThumbnailService thumbnailService,
     IConfiguration configuration,
     ILogger<IndexModel> logger) : PageModel

@@ -16,7 +16,7 @@ namespace Spikylin.Pages.Post
         }
 
         [BindProperty(SupportsGet = true)]
-        public required Features.Blog.Dto.Post Post { get; set; }
+        public required Features.Blog.Dto.BlogPost Post { get; set; }
         public void OnGet(string fileName)
         {
             // Use the fileName to locate and load the document.
@@ -26,7 +26,7 @@ namespace Spikylin.Pages.Post
             {
                 var markdownContent = System.IO.File.ReadAllText(filePath);
                 var markdown = _markdownParser.Parse(markdownContent, filePath);
-                Post = new Features.Blog.Dto.Post
+                Post = new Features.Blog.Dto.BlogPost
                 {
                     FileName = fileName,
                     Markdown = markdown

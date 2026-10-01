@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
 using Spikylin.Features.Blog;
 using System.Globalization;
-using PostModel = Spikylin.Features.Blog.Dto.Post;
+using PostModel = Spikylin.Features.Blog.Dto.BlogPost;
 
 namespace Spikylin.Pages.Blog
 {

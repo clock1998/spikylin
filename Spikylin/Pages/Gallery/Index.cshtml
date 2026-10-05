@@ -45,11 +45,21 @@
     }
 </main>
 
-<dialog id="photo-modal" class="photo-modal m-0 h-screen max-h-none w-screen max-w-none bg-black/95 p-0 text-white backdrop:bg-black/80">
+<dialog id="photo-modal"
+        class="photo-modal m-0 h-screen max-h-none w-screen max-w-none bg-black/95 p-0 text-white backdrop:bg-black/80"
+        hx-on:click="if (event.target === this) this.close()"
+        hx-on:close="document.getElementById('photo-modal-content').innerHTML = ''">
     <div class="relative flex h-full w-full items-center justify-center p-4 sm:p-8">
-        <button id="photo-modal-close" type="button" class="btn btn-circle btn-ghost absolute top-4 right-4 z-10 text-2xl text-white" aria-label="Close photo viewer">&times;</button>
+        <button id="photo-modal-close"
+                type="button"
+                class="btn btn-circle btn-ghost absolute top-4 right-4 z-10 text-2xl text-white"
+                aria-label="Close photo viewer"
+                hx-on:click="this.closest('dialog').close()">
+            &times;
+        </button>
 
-        <div id="photo-modal-content">
+        <div id="photo-modal-content"
+             hx-on::after-swap="this.closest('dialog').showModal()">
             <!-- HTMX response goes here -->
         </div>
 
@@ -71,36 +81,3 @@
         }
     }
 </style>
-
-<script>
-    (() => {
-        const modal = document.getElementById('photo-modal');
-        const closeButton = document.getElementById('photo-modal-close');
-
-        if (!modal || !closeButton) {
-            return;
-        }
-
-        const closeModal = () => modal.close();
-
-        closeButton.addEventListener('click', closeModal);
-
-        modal.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
-
-        document.body.addEventListener('htmx:afterSwap', (event) => {
-            if (event.detail.target.id !== 'photo-modal-content') {
-                return;
-            }
-
-            modal.showModal();
-        });
-
-        modal.addEventListener('close', () => {
-            document.getElementById('photo-modal-content').innerHTML = '';
-        });
-    })();
-</script>

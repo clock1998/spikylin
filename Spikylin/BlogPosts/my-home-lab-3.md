@@ -1,5 +1,5 @@
 ---
-title : Racking my Home Lab
+title : My Home Lab v3
 description: Hardware
 date: '2026-04-20'
 tags: 

@@ -1,5 +1,5 @@
 ---
-title : New Router for my Home Lab
+title : My Home Lab v2
 description: Hardware
 date: '2025-03-06'
 tags: 
@@ -20,6 +20,6 @@ MikroTik RB5009
 
 <img src="https://spikylin-s3.spikylin.com/blog-images/homelab/my-home-lab-2/1.jpg" alt="Netgear R7000" width="400"/>
 
-I haved followered [An introduction to MIkroTick RouterOS for Newbies](https://www.youtube.com/watch?v=rwjtRLQjMjA&t=1038s) to set up my router. The RouterOS does have a steep learning curve, but it is well worth the time to learn it. I do not think it is very hard to learn for people who have some basic network knowledge.
+I have followed [An introduction to MIkroTick RouterOS for Newbies](https://www.youtube.com/watch?v=rwjtRLQjMjA&t=1038s) to set up my router. The RouterOS does have a steep learning curve, but it is well worth the time to learn it. I do not think it is very hard to learn for people who have some basic network knowledge.
 
 I will create a learning note for RouterOS.
